@@ -1,0 +1,29 @@
+installer docker
+
+installer k3d:
+wget -qO - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+installer kubetcl :
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+
+Utilise cette commande pour que le port 80 et 8888 de ton ordi communiquent avec le cluster:
+k3d cluster create me-cluster --agents 2 -p "8080:80@loadbalancer" -p "8888:8888@loadbalancer"
+
+Installer argoCD:
+- Crée un namespace dédié : 
+kubectl create namespace argocd
+- Applique le script officiel :
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+Par défaut, Argo CD est "caché" dans le cluster. Pour y accéder depuis ton navigateur :
+
+Port-forward : kubectl port-forward svc/argocd-server -n argocd 8443:443
+
+Va sur https://localhost:8080.
+
+Login : admin.
+
+Password : Récupère-le avec cette commande :
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
