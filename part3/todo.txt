@@ -27,3 +27,14 @@ Login : admin.
 
 Password : Récupère-le avec cette commande :
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+La vérification (Le test final)
+Une fois qu'Argo CD affiche "Synced" en vert :
+
+Vérifie que tes Pods tournent : kubectl get pods -n dev.
+
+Modifie ton fichier deployment.yaml sur GitHub (passe à replicas: 3).
+
+Attends (ou clique sur "Refresh" dans Argo CD).
+
+Magie : Tu verras les 2 nouveaux Pods apparaître tout seuls dans l'interface.
