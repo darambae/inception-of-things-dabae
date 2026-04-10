@@ -4,7 +4,7 @@ metadata:
   name: wil-playground
   namespace: dev
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: wil-app
@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
       - name: wil-container
-        image: wil42/playground:v1
+        image: wil42/playground:v2
         ports:
         - containerPort: 8888
