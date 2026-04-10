@@ -5,7 +5,6 @@ sudo -E apt-get install -y -q openssh-client curl
 
 curl -sfL https://get.k3s.io | sh -s - server \
   --write-kubeconfig-mode 644 \
-  --disable traefik \
   --disable metrics-server \
   --disable-cloud-controller
 

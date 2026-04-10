@@ -1,8 +1,8 @@
 
 build:
 	@echo "Building VMs....."
-	vagrant up --no-provision
-	vagrant provision dabaeS
+	vagrant up --no-provision && \
+	vagrant provision dabaeS && \
 	vagrant provision dabaeSW
 
 clean:
