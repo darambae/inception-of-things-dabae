@@ -37,7 +37,7 @@ kind: Deployment
 metadata:
   name: app2-deployment
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: app2
@@ -68,7 +68,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app2-deployment
+  name: app3-deployment
 spec:
   replicas: 1
   selector:
@@ -100,4 +100,38 @@ spec:
 # 2. Ingress for 3 applications
 apiVersion: networking.k8s.io/v1
 kind: Ingress
-metad
+metadata:
+  name: app-ingress
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: app1.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-service
+            port:
+              number: 80
+  - host: app2.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service
+            port:
+              number: 80
+  - host: app3.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: app3-service
+            port:
+              number: 80
