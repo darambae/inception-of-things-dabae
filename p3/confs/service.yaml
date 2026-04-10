@@ -4,6 +4,7 @@ metadata:
   name: wil-service
   namespace: dev
 spec:
+  type: LoadBalancer
   selector:
     app: wil-app
   ports:
