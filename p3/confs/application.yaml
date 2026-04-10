@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: 'https://github.com/darambae/inception-of-things-dabae.git'
     targetRevision: HEAD
-    path: part3/confs
+    path: p3/confs
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: dev
