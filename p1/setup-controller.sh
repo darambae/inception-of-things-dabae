@@ -1,15 +1,13 @@
 #!/bin/bash
 export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get update
-sudo -E apt-get install -y -q openssh-client curl sshpass
+sudo -E apt-get install -y -q openssh-client curl
 
 curl -sfL https://get.k3s.io | sh -s - server \
   --write-kubeconfig-mode 644 \
   --disable traefik \
   --disable metrics-server \
-  --disable-cloud-controller \
-  --kube-apiserver-arg="max-requests-inflight=10" \
-  --kube-apiserver-arg="max-mutating-requests-inflight=5"
+  --disable-cloud-controller
 
 if ! grep -q "alias k=" /home/vagrant/.bashrc; then
     echo 'alias k="kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml"' >> /home/vagrant/.bashrc
@@ -27,6 +25,6 @@ chmod 700 /home/vagrant/.ssh
 chmod 600 /home/vagrant/.ssh/id_rsa
 chmod 644 /home/vagrant/.ssh/id_rsa.pub
 
-sshpass -p "vagrant" ssh-copy-id -i /home/vagrant/.ssh/id_rsa.pub -o StrictHostKeyChecking=no vagrant@192.168.56.111
+cp /home/vagrant/.ssh/id_rsa.pub /vagrant/controller_id_rsa.pub
 
 sudo cat /var/lib/rancher/k3s/server/node-token > /vagrant/node-token
