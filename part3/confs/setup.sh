@@ -1,35 +1,43 @@
 #!/bin/bash
+# setup.sh — installe uniquement les outils nécessaires
 set -e
 
-sudo apt update
-sudo apt install -y curl
+echo "==> Mise à jour des paquets..."
+sudo apt-get update -qq
+sudo apt-get install -y curl
 
-# 1. Install Docker (The Simple way, with a check)
-if ! command -v docker &> /dev/null; then
-    echo "Installing Docker..."
+# Docker
+if ! command -v docker &>/dev/null; then
+    echo "==> Installation de Docker..."
     curl -fsSL https://get.docker.com | sh
-    sudo usermod -aG docker $USER
+    sudo usermod -aG docker "$USER"
+    echo "⚠️  Docker installé. Si c'est la première fois, relance le script après 'newgrp docker' ou reconnecte-toi."
 fi
 
-# 2. Install k3d
-if ! command -v k3d &> /dev/null; then
-    echo "Installing k3d..."
+# k3d
+if ! command -v k3d &>/dev/null; then
+    echo "==> Installation de k3d..."
     curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 fi
 
-# 3. Install kubectl
-if ! command -v kubectl &> /dev/null; then
-    echo "Installing kubectl..."
+# kubectl
+if ! command -v kubectl &>/dev/null; then
+    echo "==> Installation de kubectl..."
     K8S_VERSION=$(curl -L -s https://dl.k8s.io/release/stable.txt)
     curl -LO "https://dl.k8s.io/release/${K8S_VERSION}/bin/linux/amd64/kubectl"
     chmod +x ./kubectl
     sudo mv ./kubectl /usr/local/bin/kubectl
 fi
 
-k3d cluster create me-cluster --agents 2 -p "8080:80@loadbalancer" -p "8888:8888@loadbalancer"
+# argocd CLI (optionnel mais pratique pour les commandes argocd app sync etc.)
+if ! command -v argocd &>/dev/null; then
+    echo "==> Installation de la CLI ArgoCD..."
+    ARGOCD_VERSION=$(curl -s https://api.github.com/repos/argoproj/argo-cd/releases/latest | grep tag_name | cut -d'"' -f4)
+    curl -sSL -o /tmp/argocd "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
+    chmod +x /tmp/argocd
+    sudo mv /tmp/argocd /usr/local/bin/argocd
+fi
 
-kubectl create namespace argocd
-kubectl create namespace dev
-
-kubectl apply -n argocd -f application.yaml
-kubectl port-forward svc/argocd-server -n argocd 8443:443
+echo ""
+echo "✅ Tous les outils sont installés."
+echo "   Lance 'make' pour créer le cluster et déployer ArgoCD."
