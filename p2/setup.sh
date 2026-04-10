@@ -7,6 +7,8 @@ sudo -E apt-get install -y -q curl
 curl -sfL https://get.k3s.io | sh -s - server \
   --write-kubeconfig-mode 644 \
   --disable metrics-server \
+  --node-ip=192.168.56.110 \
+  --flannel-iface=enp0s8 \
   --disable-cloud-controller
 
 if ! grep -q "alias k=" /home/vagrant/.bashrc; then
