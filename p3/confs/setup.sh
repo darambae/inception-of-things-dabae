@@ -4,7 +4,7 @@ set -e
 
 echo "==> Mise à jour des paquets..."
 sudo apt-get update -qq
-sudo apt-get install -y curl
+sudo apt-get install -y curl build-essential git
 
 # Docker
 if ! command -v docker &>/dev/null; then
