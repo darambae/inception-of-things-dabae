@@ -1,6 +1,6 @@
 set -e
 
-sudo apt-get install -y helm
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 kubectl create namespace gitlab --dry-run=client -o yaml | kubectl apply -f -
 
