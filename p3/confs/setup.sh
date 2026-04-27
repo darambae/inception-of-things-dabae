@@ -29,6 +29,14 @@ if ! command -v kubectl &>/dev/null; then
     sudo mv ./kubectl /usr/local/bin/kubectl
 fi
 
+# Add aliases to .bashrc
+if ! grep -q "alias k=" ~/.bashrc; then
+    echo "⌨️ Adding aliases (k=kubectl)..."
+    echo 'alias k="kubectl"' >> ~/.bashrc
+    echo 'source <(kubectl completion bash)' >> ~/.bashrc
+    echo 'complete -F __start_kubectl k' >> ~/.bashrc
+fi
+
 # argocd CLI (optionnel mais pratique pour les commandes argocd app sync etc.)
 if ! command -v argocd &>/dev/null; then
     echo "==> Installation de la CLI ArgoCD..."
