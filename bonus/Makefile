@@ -1,0 +1,5 @@
+
+
+
+password:
+	kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode && echo

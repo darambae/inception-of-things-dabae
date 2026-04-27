@@ -1,0 +1,24 @@
+global:
+  hosts:
+    domain: 127.0.0.1.nip.io
+  ingress:
+    configureCertmanager: false 
+    tls:
+      enabled: false
+
+gitlab:
+  webservice:
+    resources:
+      requests:
+        memory: 1.5Gi
+  sidekiq:
+    resources:
+      requests:
+        memory: 512Mi
+
+prometheus:
+  install: false
+grafana:
+  enabled: false
+gitlab-runner:
+  install: false
