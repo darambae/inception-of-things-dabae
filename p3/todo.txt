@@ -21,7 +21,7 @@ Par défaut, Argo CD est "caché" dans le cluster. Pour y accéder depuis ton na
 
 Port-forward : kubectl port-forward svc/argocd-server -n argocd 8443:443
 
-Va sur https://localhost:8080.
+Va sur https://localhost:8443.
 
 Login : admin.
 
@@ -38,3 +38,32 @@ Modifie ton fichier deployment.yaml sur GitHub (passe à replicas: 3).
 Attends (ou clique sur "Refresh" dans Argo CD).
 
 Magie : Tu verras les 2 nouveaux Pods apparaître tout seuls dans l'interface.
+
+
+//////////////////////////////
+
+# 1. Une seule fois — installer les outils
+./setup.sh
+
+# 2. Construire tout le cluster
+make build
+# → crée le cluster k3d
+# → crée les namespaces argocd et dev
+# → installe ArgoCD dans le cluster
+# → attend que ArgoCD soit prêt
+# → applique confs/application.yaml (lien vers GitHub)
+# → affiche le mot de passe admin
+
+# 3. Dans un AUTRE terminal — accéder à l'UI
+make forward
+# → ouvre https://localhost:8443 dans ton navigateur
+# → login : admin / mot de passe affiché par make build
+
+# 4. Pour tout nettoyer et recommencer
+make re
+
+Pour tester si tout fonctionne : 
+# Changer v1 → v2 dans ton repo GitHub, puis :
+make sync       # force la synchronisation ArgoCD
+curl http://localhost:8888/
+# {"status":"ok", "message": "v2"}
