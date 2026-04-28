@@ -46,6 +46,10 @@ if ! command -v argocd &>/dev/null; then
     sudo mv /tmp/argocd /usr/local/bin/argocd
 fi
 
+# Add user to docker group to prevent permission issues with k3d
+sudo usermod -aG docker $USER
+newgrp docker
+
 echo ""
 echo "✅ Tous les outils sont installés."
 echo "   Lance 'make' pour créer le cluster et déployer ArgoCD."

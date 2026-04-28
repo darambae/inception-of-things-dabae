@@ -9,10 +9,10 @@ helm repo update
 helm install gitlab gitlab/gitlab \
   --namespace gitlab \
   -f ../confs/values.yaml \
-  --timeout 20m
+  --timeout 30m
 
 ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode)
-argocd login 127.0.0.1:8080 --username admin --password "$ARGOCD_PWD" --insecure
+argocd login 127.0.0.1:9443 --username admin --password "$ARGOCD_PWD" --insecure
 argocd repo add http://gitlab.127.0.0.1.nip.io/root/inception-of-things-dabae.git \
     --username root \
     --password "$ARGOCD_PWD"
