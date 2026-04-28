@@ -79,7 +79,7 @@ password:
 
 forward:
 	@echo "$(GREEN)UI ArgoCD dispo sur : https://localhost:8443$(RESET)"
-	kubectl port-forward svc/argocd-server -n $(ARGOCD_NS) 8443:443
+	kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 8443:443
 
 sync:
 	kubectl -n $(ARGOCD_NS) patch configmap argocd-cm --patch \

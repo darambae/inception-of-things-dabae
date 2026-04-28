@@ -3,7 +3,7 @@
 set -e
 
 echo "==> Mise à jour des paquets..."
-sudo apt-get update -qq
+sudo apt-get update -q
 sudo apt-get install -y curl build-essential git
 
 # Docker
