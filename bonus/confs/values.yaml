@@ -5,6 +5,7 @@ global:
     configureCertmanager: false 
     tls:
       enabled: false
+  edition: ce
 
 gitlab:
   webservice:
