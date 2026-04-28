@@ -8,17 +8,37 @@ global:
 
 gitlab:
   webservice:
+    replicas: 1
     resources:
       requests:
         memory: 1.5Gi
   sidekiq:
+    replicas: 1
     resources:
       requests:
         memory: 512Mi
+  kas:
+    enabled: false
+  gitlab-shell:
+    replicas: 1
+
+postgresql:
+  resources:
+    requests:
+      memory: "256Mi"
+
+redis:
+  resources:
+    requests:
+      memory: "128Mi"
 
 prometheus:
   install: false
 grafana:
   enabled: false
 gitlab-runner:
+  install: false
+gitlab-exporter:
+  enabled: false
+certmanager:
   install: false

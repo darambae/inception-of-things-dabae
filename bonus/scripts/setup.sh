@@ -9,7 +9,7 @@ helm repo update
 helm install gitlab gitlab/gitlab \
   --namespace gitlab \
   -f ../confs/values.yaml \
-  --timeout 10m
+  --timeout 20m
 
 ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode)
 argocd login 127.0.0.1:8080 --username admin --password "$ARGOCD_PWD" --insecure

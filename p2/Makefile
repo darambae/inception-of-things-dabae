@@ -5,3 +5,5 @@ build:
 clean:
 	@echo "Cleaning up VMs....."
 	vagrant destroy -f && rm -rf .vagrant
+
+.PHONY: build clean

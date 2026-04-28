@@ -65,9 +65,6 @@ clean:
 	@echo "$(RED)Suppression du cluster $(NAME)...$(RESET)"
 	k3d cluster delete $(NAME)
 
-fclean: clean
-	@echo "$(RED)Nettoyage complet.$(RESET)"
-
 re: fclean build
 
 # ─── Utilitaires ─────────────────────────────────────────────────────────────
