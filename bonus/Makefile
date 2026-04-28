@@ -1,4 +1,7 @@
 
+rm-pods:
+	k delete pods --all-namespaces --field-selector status.phase=Failed
+
 clean:
 	@echo "$(RED)Cleaning up GitLab and Bonus resources...$(RESET)"
 	@helm uninstall gitlab -n gitlab 2>/dev/null || true
