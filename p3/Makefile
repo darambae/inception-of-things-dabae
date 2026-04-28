@@ -43,7 +43,7 @@ argocd-wait:
 	kubectl wait --for=condition=ready pod \
 		-l app.kubernetes.io/name=argocd-server \
 		-n $(ARGOCD_NS) \
-		--timeout=300s
+		--timeout=10m
 
 # ─── Application ArgoCD (lien GitHub → cluster) ─────────────────────────────
 
@@ -64,6 +64,9 @@ stop:
 clean:
 	@echo "$(RED)Suppression du cluster $(NAME)...$(RESET)"
 	k3d cluster delete $(NAME)
+
+fclean: clean
+	@echo "$(GREEN)Nettoyage complet effectué.$(RESET)"
 
 re: fclean build
 
