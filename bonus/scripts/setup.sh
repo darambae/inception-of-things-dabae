@@ -37,10 +37,5 @@ git remote add origin http://gitlab.127.0.0.1.nip.io:8081/root/inception-of-thin
 git add .
 git commit -m "Initial commit"
 git push -u origin main --force
-argocd repo add http://gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git \
-    --username root \
-    --password "$GITLAB_PWD" \
-    --insecure \
-    --server 127.0.0.1:9443
 
-# kubectl apply -f ../confs/application.yaml
+kubectl apply -f ../confs/application.yaml
