@@ -1,6 +1,14 @@
 
+build-vm:
+	@echo "Building VMs....."
+	vagrant up
+
+clean-vm:
+	@echo "Cleaning up VMs....."
+	vagrant destroy -f && rm -rf .vagrant
+
 rm-pods:
-	k delete pods --all-namespaces --field-selector status.phase=Failed
+	@kubectl delete pods --all-namespaces --field-selector status.phase=Failed
 
 clean:
 	@echo "$(RED)Cleaning up GitLab and Bonus resources...$(RESET)"
@@ -12,17 +20,20 @@ clean:
 
 forward-gitlab:
 	@echo "$(GREEN)Forwarding GitLab on http://localhost:8081...$(RESET)"
-	kubectl port-forward --address 0.0.0.0 svc/gitlab -n gitlab 8081:80
+	@kubectl port-forward --address 0.0.0.0 svc/gitlab-nginx-ingress-controller -n gitlab 8081:80
 
-build-vm:
-	@echo "Building VMs....."
-	vagrant up
-
-clean-vm:
-	@echo "Cleaning up VMs....."
-	vagrant destroy -f && rm -rf .vagrant
 
 password:
-	k get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode && echo
+	@k get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode && echo
 
-.PHONY: build-vm clean clean-vm password
+.PHONY: build-vm clean clean-vm password rm-pods forward-gitlab
+
+# To see the details of a pod: kubectl describe pod <pod_name> -n <namespace>
+# To see logs of a pod: kubectl logs <pod_name> -n <namespace>
+# To see live logs of a pod: kubectl logs -f <pod_name> -n <namespace>
+
+# Gitlab is fully operational if the following pods are in "Running" state and "Ready" condition:
+# 1. gitlab-postgresql-0 is running and ready
+# 2. gitlab-redis-0 is running and ready
+# 3. gitlab-gitaly-0 is running and ready
+# 4. gitlab-webservice-default-<random> is running and ready 
