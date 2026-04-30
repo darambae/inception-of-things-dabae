@@ -1,30 +1,20 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Application
-# metadata:
-#   name: app-controller
-#   namespace: argocd
-# spec:
-#   project: default
-#   source:
-#     repoURL: 'http://gitlab.127.0.0.1.nip.io/root/inception-of-things-bonus.git'
-#     targetRevision: HEAD
-#     path: bonus/confs
-#   destination:
-#     server: 'https://kubernetes.default.svc'
-#     namespace: dev
-#   syncPolicy:
-#     automated:
-#       selfHeal: true
-#       prune: true
-apiVersion: v1
-kind: Secret
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
-  name: gitlab-repo-config
+  name: app-bonus
   namespace: argocd
-  labels:
-    argocd.argoproj.io/secret-type: repository
-stringData:
-  type: git
-  url: http://gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git
-  username: root
-  password: RIn0Z9xVwR2nfa45pG5kRj6Hlde0tvU6k2ujXavB1vEOJya1ByUEbcdN3zGtry0d
+spec:
+  project: default
+  source:
+    repoURL: git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git
+    targetRevision: main
+    path: confs
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
