@@ -1,7 +1,7 @@
 #!/bin/bash
 
-TIMEOUT_SEC=300
-INTERVAL=5
+TIMEOUT_SEC=3600
+INTERVAL=60
 
 echo "Check the readiness of essential GitLab Pods... (Maximum wait time: ${TIMEOUT_SEC} seconds)"
 

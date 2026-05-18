@@ -1,7 +1,7 @@
 GREEN = \033[0;32m
 RED   = \033[0;31m
 RESET = \033[0m
-
+CURRENT_DIR := $(CURDIR)
 # To manage VM on your host machine
 build-vm:
 	@echo "Building VMs....."
@@ -16,13 +16,13 @@ build: setup-dependencies confirm-status setup-argocd setup-git
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
-	@chmod +x scripts/setup.sh
-	@./scripts/setup.sh
+	@chmod +x $(CURRENT_DIR)/scripts/setup.sh
+	@$(CURRENT_DIR)/scripts/setup.sh
 
 confirm-status:
 	@echo "$(GREEN)Checking GitLab Pods Status...$(RESET)"
-	@chmod +x scripts/check-status.sh
-	@./scripts/check-status.sh
+	@chmod +x $(CURRENT_DIR)/scripts/check-status.sh
+	@$(CURRENT_DIR)/scripts/check-status.sh
 
 setup-argocd:
 	@echo "$(GREEN)Setting up ArgoCD & Injecting SSH Key...$(RESET)"
@@ -43,7 +43,7 @@ setup-argocd:
 setup-git:
 	@echo "$(GREEN)Initializing Git repository and pushing code...$(RESET)"
 	mkdir -p inception-of-things-bonus
-	cp -r inception-of-things-dabae/bonus/* inception-of-things-bonus/ 2>/dev/null || true
+	cp -r $(CURRENT_DIR)/../inception-of-things-dabae/bonus/* inception-of-things-bonus/ 2>/dev/null || true
 	cd inception-of-things-bonus && \
 		git init --initial-branch=main && \
 		git config user.email "dabae@gmail.com" && \
@@ -70,11 +70,14 @@ forward-gitlab:
 	@echo "$(GREEN)Forwarding GitLab on http://localhost:8081...$(RESET)"
 	@kubectl port-forward --address 0.0.0.0 svc/gitlab-nginx-ingress-controller -n gitlab 8081:80
 
-
 password:
 	@kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode && echo
 
-.PHONY: build-vm clean clean-vm password rm-pods forward-gitlab
+max-memory:
+	sudo lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+	sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+
+.PHONY: build-vm clean clean-vm password rm-pods forward-gitlab max-memory
 
 # To see the details of a pod: kubectl describe pod <pod_name> -n <namespace>
 # To see logs of a pod: kubectl logs <pod_name> -n <namespace>
