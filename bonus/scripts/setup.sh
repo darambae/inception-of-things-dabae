@@ -13,8 +13,8 @@ helm install gitlab gitlab/gitlab \
 
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""
 PUB_KEY=$(cat ~/.ssh/id_rsa_argocd.pub)
-kubectl get pods -n gitlab | grep toolbox
-kubectl exec -it -n gitlab <toolbox_pod_name> -- \
+TOOLBOX_POD=$(kubectl get pods -n gitlab -o jsonpath='{.items[?(@.metadata.name.__contains__("toolbox"))].metadata.name}')
+kubectl exec -it -n gitlab $TOOLBOX_POD -- \
     gitlab-rails runner "user = User.find_by_username('root'); \
     key = Key.new(title: 'argocd-ssh-key', key: '$PUB_KEY', user: user); \
     if key.save; puts 'SSH Key Registered Successfully!'; else; puts key.errors.full_messages; end"
@@ -26,7 +26,7 @@ argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-
     --insecure-ignore-host-key \
     --server 127.0.0.1:9443
 GITLAB_PWD=$(kubectl -n gitlab get secret gitlab-gitlab-initial-root-password -o jsonpath="{.data.password}" | base64 --decode)
-git clone https://github.com/darambae/inception-of-things-dabae.git
+#git clone https://github.com/darambae/inception-of-things-dabae.git
 cp -r inception-of-things-dabae/bonus inception-of-things-bonus
 cd ../../../inception-of-things-bonus
 
