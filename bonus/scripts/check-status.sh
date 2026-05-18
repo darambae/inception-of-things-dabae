@@ -5,7 +5,7 @@ INTERVAL=60
 
 echo "Check the readiness of essential GitLab Pods... (Maximum wait time: ${TIMEOUT_SEC} seconds)"
 
-STATEFUL_PODS=("gitlab-postgresql-0" "gitlab-redis-0" "gitlab-gitaly-0")
+STATEFUL_PODS=("gitlab-postgresql-0" "gitlab-redis-master-0" "gitlab-gitaly-0")
 TOOLBOX_POD=$(kubectl get pods -n gitlab -o custom-columns=NAME:.metadata.name --no-headers | grep toolbox)
 if [ -n "$TOOLBOX_POD" ]; then
     STATEFUL_PODS+=("$TOOLBOX_POD")
