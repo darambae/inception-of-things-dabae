@@ -13,7 +13,7 @@ clean-vm:
 	vagrant destroy -f && rm -rf .vagrant
 #-------------------------------------------------------------------
 # Inside VM
-build: setup-dependencies max-memory confirm-status connect-gitlab-argocd 
+build: setup-dependencies max-memory confirm-status forward connect-gitlab-argocd 
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
@@ -24,6 +24,11 @@ confirm-status:
 	@echo "$(GREEN)Checking GitLab Pods Status...$(RESET)"
 	@chmod +x $(CURRENT_DIR)/scripts/check-status.sh
 	@$(CURRENT_DIR)/scripts/check-status.sh
+
+forward:
+	@echo "$(GREEN)Forwarding GitLab on http://localhost:8081 in background...$(RESET)"
+	@nohup kubectl port-forward --address 0.0.0.0 svc/gitlab-nginx-ingress-controller -n gitlab 8081:80 > /dev/null 2>&1 &
+	@sleep 2
 
 connect-gitlab-argocd:
 	@echo "$(GREEN)Connecting GitLab with ArgoCD...$(RESET)"
@@ -66,10 +71,6 @@ clean:
 	@argocd repo rm http://gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git --insecure 2>/dev/null || true
 	
 	@echo "$(GREEN)Cleanup complete. Ready for re-run.$(RESET)"
-
-forward:
-	@echo "$(GREEN)Forwarding GitLab on http://localhost:8081...$(RESET)"
-	@kubectl port-forward --address 0.0.0.0 svc/gitlab-nginx-ingress-controller -n gitlab 8081:80
 
 password:
 	@echo "$(GREEN)GitLab Root Password:$(RESET)"

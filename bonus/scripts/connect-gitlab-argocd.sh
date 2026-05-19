@@ -34,7 +34,6 @@ end
 "
 
 ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode)
-
 argocd login 127.0.0.1:9443 --username admin --password "$ARGOCD_PWD" --insecure
 
 argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
