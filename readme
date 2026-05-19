@@ -1,0 +1,16 @@
+Afin de tester ce projet vous devez d'abord :
+    - installer vagrant
+    - installer virtualbox
+
+ensuite pour la partie 1:
+    pour construire la machine virtuelle:
+    - placer vous dans le dossier p1
+    - make build
+    pour tester le projet:
+
+pour la partie 2:
+    pour construire la machine virtuelle:
+    - placer vous dans le dossier p2
+    - make build
+    pour tester le projet:
+    - curl

@@ -1,24 +1,59 @@
-Vagrant.configure("2") do |config|
-  config.vm.box = "bento/ubuntu-24.04"
+# Vagrant.configure("2") do |config|
+#  config.vm.box = "bento/ubuntu-24.04"
 
+#  config.vm.network "private_network", ip: "192.168.56.10"
+#  config.vm.disk :disk, size: "70GB", primary: true
+#  config.vm.provider "virtualbox" do |vb|
+#    vb.memory = "12288"
+#    vb.cpus = 8
+#    vb.name = "GitLab-Server-Ubuntu2404"
+   
+#    vb.customize ["modifyvm", :id, "--vram", "128"]
+#    vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+#  end
+
+#  config.vm.provision "shell", inline: <<-SHELL
+#    apt-get update
+#    apt-get install -y curl openssh-server ca-certificates perl vim make
+#    sudo fallocate -l 4G /swapfile
+#    sudo chmod 600 /swapfile
+#    sudo mkswap /swapfile
+#    sudo swapon /swapfile
+#    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+#  SHELL
+# end
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/bookworm64"
+
+  config.vm.hostname = "iot-bonus"
   config.vm.network "private_network", ip: "192.168.56.10"
-  config.vm.disk :disk, size: "70GB", primary: true
+  config.vm.disk :disk, size: "30GB", primary: true
+
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = "12288"
-    vb.cpus = 8
-    vb.name = "GitLab-Server-Ubuntu2404"
-    
-    vb.customize ["modifyvm", :id, "--vram", "128"]
+    vb.name   = "GitLab-Server"
+    vb.memory = "6144"
+    vb.cpus   = 2
+    vb.customize ["modifyvm", :id, "--vram", "16"]
     vb.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
+    vb.customize ["modifyvm", :id, "--audio", "none"]
+    vb.customize ["modifyvm", :id, "--usb", "off"]
+    vb.customize ["modifyvm", :id, "--usbehci", "off"]
+    # Fix DNS dans VirtualBox
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
   end
 
   config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    apt-get install -y curl openssh-server ca-certificates perl vim make
-    sudo fallocate -l 4G /swapfile
-    sudo chmod 600 /swapfile
-    sudo mkswap /swapfile
-    sudo swapon /swapfile
-    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    apt-get update -qq
+    apt-get install -y curl openssh-server ca-certificates perl vim make git
+
+    fallocate -l 4G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    echo 'vm.swappiness=10' >> /etc/sysctl.conf
+    sysctl -p
   SHELL
 end
