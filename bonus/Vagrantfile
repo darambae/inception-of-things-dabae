@@ -20,6 +20,5 @@ Vagrant.configure("2") do |config|
     sudo mkswap /swapfile
     sudo swapon /swapfile
     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
-    git clone https://github.com/darambae/inception-of-things-dabae.git
   SHELL
 end

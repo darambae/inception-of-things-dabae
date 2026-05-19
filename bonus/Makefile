@@ -13,7 +13,7 @@ clean-vm:
 	vagrant destroy -f && rm -rf .vagrant
 #-------------------------------------------------------------------
 # Inside VM
-build: setup-dependencies max-memory confirm-status connect-gitlab-argocd forward-gitlab 
+build: setup-dependencies max-memory confirm-status connect-gitlab-argocd 
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
@@ -67,7 +67,7 @@ clean:
 	
 	@echo "$(GREEN)Cleanup complete. Ready for re-run.$(RESET)"
 
-forward-gitlab:
+forward:
 	@echo "$(GREEN)Forwarding GitLab on http://localhost:8081...$(RESET)"
 	@kubectl port-forward --address 0.0.0.0 svc/gitlab-nginx-ingress-controller -n gitlab 8081:80
 
