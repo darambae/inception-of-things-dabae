@@ -6,7 +6,7 @@ GREEN='\033[0;32m'
 RESET='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BONUS_DIR="$(cd "$SCRIPT_DIR/../inception-of-things-bonus" 2>/dev/null && pwd || echo "$SCRIPT_DIR/../inception-of-things-bonus")"
+BONUS_DIR="$SCRIPT_DIR/../../inception-of-things-bonus"
 
 echo -e "${GREEN}Setting up ArgoCD & Injecting SSH Key...${RESET}"
 
@@ -58,7 +58,7 @@ git config user.name "daram bae"
 
 GITLAB_USER="root"
 GITLAB_PASS=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode)
-ENCODED_PASS=$(echo -n "$GITLAB_PASS" | curl -s -o /dev/null -w "%{url_encoded}\n" -)
+ENCODED_PASS=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1]))' "$GITLAB_PASS")
 
 GITLAB_HTTP_URL="http://${GITLAB_USER}:${ENCODED_PASS}@gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git"
 

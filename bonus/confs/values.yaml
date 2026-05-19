@@ -7,39 +7,121 @@ global:
       enabled: false
   edition: ce
 
+certmanager:
+  enabled: false
+prometheus:
+  install: false
+gitlab-runner:
+  install: false
+
+nginx-ingress:
+  enabled: true
+  controller:
+    replicaCount: 1
+    minAvailable: 1
+
 gitlab:
+  kas:
+    enabled: false
+  registry:
+    enabled: false  # 컨테이너 레지스트리를 안 쓰신다면 꺼서 리소스 확보!
+  gitlab-exporter:
+    enabled: false
+
+  # 웹 서비스 설정 (1개 고정)
   webservice:
     replicas: 1
+    minReplicas: 1
+    hpa:
+      enabled: false
     resources:
       requests:
         memory: 1.5Gi
+        cpu: 200m
+
   sidekiq:
     replicas: 1
+    minReplicas: 1
+    hpa:
+      enabled: false
     resources:
       requests:
-        memory: 512Mi
-  kas:
-    enabled: false
+        memory: 450Mi
+        cpu: 100m
+
   gitlab-shell:
     replicas: 1
+    minReplicas: 1
+    hpa:
+      enabled: false
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 50m
 
 postgresql:
   resources:
     requests:
       memory: "256Mi"
+      cpu: "100m"
 
 redis:
   resources:
     requests:
       memory: "128Mi"
+      cpu: "50m"
 
-prometheus:
-  install: false
-grafana:
-  enabled: false
-gitlab-runner:
-  install: false
-gitlab-exporter:
-  enabled: false
-certmanager:
-  enabled: false
+minio:
+  replicas: 1
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+# global:
+#   hosts:
+#     domain: 127.0.0.1.nip.io
+#   ingress:
+#     configureCertmanager: false 
+#     tls:
+#       enabled: false
+#   edition: ce
+
+# gitlab:
+#   webservice:
+#     replicas: 1
+#     minReplicas: 1
+#     hpa:
+#       enable: false
+#     resources:
+#       requests:
+#         memory: 1.5Gi
+#   sidekiq:
+#     replicas: 1
+#     resources:
+#       requests:
+#         memory: 512Mi
+#   kas:
+#     enabled: false
+#   gitlab-shell:
+#     replicas: 1
+
+# postgresql:
+#   resources:
+#     requests:
+#       memory: "256Mi"
+
+# redis:
+#   resources:
+#     requests:
+#       memory: "128Mi"
+
+# prometheus:
+#   install: false
+# grafana:
+#   enabled: false
+# gitlab-runner:
+#   install: false
+# gitlab-exporter:
+#   enabled: false
+# certmanager:
+#   enabled: false
