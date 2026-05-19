@@ -13,7 +13,7 @@ clean-vm:
 	vagrant destroy -f && rm -rf .vagrant
 #-------------------------------------------------------------------
 # Inside VM
-build: setup-dependencies confirm-status forward-gitlab password 
+build: setup-dependencies max-memory confirm-status forward-gitlab password 
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"

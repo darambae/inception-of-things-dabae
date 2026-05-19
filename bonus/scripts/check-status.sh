@@ -9,7 +9,7 @@ STATEFUL_PODS=("gitlab-postgresql-0" "gitlab-redis-master-0" "gitlab-gitaly-0")
 TOOLBOX_POD=$(kubectl get pods -n gitlab -o custom-columns=NAME:.metadata.name --no-headers | grep toolbox)
 MIGRATION_POD=$(kubectl get pods -n gitlab -o custom-columns=NAME:.metadata.name --no-headers | grep migrations)
 WEBSERVICE_PODS=$(kubectl get pods -n gitlab -l app=webservice --no-headers 2>/dev/null | awk '{print $1}')
-if [ -n "$TOOLBOX_POD" && -n "$MIGRATION_POD" && -n "$WEBSERVICE_PODS" ]; then
+if [ -n "$TOOLBOX_POD" ] && [ -n "$MIGRATION_POD" ] && [ -n "$WEBSERVICE_PODS" ]; then
     STATEFUL_PODS+=("$TOOLBOX_POD")
     STATEFUL_PODS+=("$MIGRATION_POD")
     for pod in $WEBSERVICE_PODS; do
