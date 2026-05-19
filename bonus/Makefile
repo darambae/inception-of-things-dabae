@@ -70,10 +70,10 @@ forward:
 password:
 	@echo "$(GREEN)GitLab Root Password:$(RESET)"
 	@kubectl exec -n gitlab deploy/gitlab -- gitlab-rake "gitlab:password:reset[root]"
-	
+
 max-memory:
-	sudo lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
-	sudo resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+	sed -i 's/sudo lvextend.*/true/' ~/inception-of-things-dabae/bonus/Makefile
+	sed -i 's/sudo resize2fs.*/true/' ~/inception-of-things-dabae/bonus/Makefile
 
 .PHONY: build-vm clean clean-vm password rm-pods forward-gitlab max-memory
 
