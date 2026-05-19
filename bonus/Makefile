@@ -13,17 +13,12 @@ clean-vm:
 	vagrant destroy -f && rm -rf .vagrant
 #-------------------------------------------------------------------
 # Inside VM
-build: setup-dependencies max-memory confirm-status forward connect-gitlab-argocd 
+build: setup-dependencies max-memory forward connect-gitlab-argocd 
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
 	@chmod +x $(CURRENT_DIR)/scripts/setup-gitlab.sh
 	@$(CURRENT_DIR)/scripts/setup-gitlab.sh
-
-confirm-status:
-	@echo "$(GREEN)Checking GitLab Pods Status...$(RESET)"
-	@chmod +x $(CURRENT_DIR)/scripts/check-status.sh
-	@$(CURRENT_DIR)/scripts/check-status.sh
 
 forward:
 	@echo "$(GREEN)Forwarding GitLab on http://localhost:8081 in background...$(RESET)"

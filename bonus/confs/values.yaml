@@ -5,30 +5,30 @@ global:
     configureCertmanager: false 
     tls:
       enabled: false
-    enable: true
+    enabled: true
     provider: generic
     class: none
   edition: ce
 
 certmanager:
-  enabled: false
+  install: false
+certmanager-issuer:
+  install: false
 prometheus:
   install: false
 gitlab-runner:
   install: false
-
 nginx-ingress:
   enabled: false
 
-gitlab:
-  kas:
-    enabled: false
-  registry:
-    enabled: false  # 컨테이너 레지스트리를 안 쓰신다면 꺼서 리소스 확보!
-  gitlab-exporter:
-    enabled: false
+kas:
+  enabled: false
+registry:
+  enabled: false
+gitlab-exporter:
+  enabled: false
 
-  # 웹 서비스 설정 (1개 고정)
+gitlab:
   webservice:
     replicas: 1
     minReplicas: 1

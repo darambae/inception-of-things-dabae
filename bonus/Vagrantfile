@@ -15,10 +15,16 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y curl openssh-server ca-certificates perl vim make
-    sudo fallocate -l 4G /swapfile
-    sudo chmod 600 /swapfile
-    sudo mkswap /swapfile
-    sudo swapon /swapfile
-    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    if [ ! -f /swapfile ]; then
+      fallocate -l 4G /swapfile
+      chmod 600 /swapfile
+      mkswap /swapfile
+      swapon /swapfile
+      echo '/swapfile none swap sw 0 0' >> /etc/fstab
+    fi
+    if [ -b /dev/mapper/ubuntu--vg-ubuntu--lv ]; then
+      lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv
+      resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv
+    fi
   SHELL
 end

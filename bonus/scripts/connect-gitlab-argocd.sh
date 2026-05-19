@@ -32,15 +32,6 @@ else
   puts '❌ Root user not found'
 end
 "
-
-ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode)
-argocd login 127.0.0.1:9443 --username admin --password "$ARGOCD_PWD" --insecure
-
-argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
-    --ssh-private-key-path ~/.ssh/id_rsa_argocd \
-    --insecure-ignore-host-key \
-    --server 127.0.0.1:9443 || echo "⚠️ Repo already exists"
-
 echo -e "${GREEN}Initializing Git repository and pushing code...${RESET}"
 
 mkdir -p "$BONUS_DIR"
@@ -66,8 +57,16 @@ git remote add origin "$GITLAB_HTTP_URL"
 
 git add .
 git commit -m "Initial commit" --allow-empty
-
 git push -u origin main
+
+ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode)
+argocd login 127.0.0.1:9443 --username admin --password "$ARGOCD_PWD" --insecure
+
+argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
+    --ssh-private-key-path ~/.ssh/id_rsa_argocd \
+    --insecure-ignore-host-key \
+    --server 127.0.0.1:9443
+
 
 echo -e "${GREEN}Applying ArgoCD Application yaml...${RESET}"
 
