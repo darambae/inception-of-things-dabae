@@ -67,10 +67,10 @@ git remote add origin "$GITLAB_HTTP_URL"
 git add .
 git commit -m "Initial commit" --allow-empty
 
-git push -u origin main --force
+git push -u origin main
 
 echo -e "${GREEN}Applying ArgoCD Application yaml...${RESET}"
-cd "$SCRIPT_DIR"
+
 kubectl apply -f confs/application.yaml
 
 echo -e "${GREEN}🎉 All Infrastructure Setup Completed Successfully!${RESET}"

@@ -34,6 +34,7 @@ connect-gitlab-argocd:
 	@echo "$(GREEN)Connecting GitLab with ArgoCD...$(RESET)"
 	@chmod +x $(CURRENT_DIR)/scripts/connect-gitlab-argocd.sh
 	@$(CURRENT_DIR)/scripts/connect-gitlab-argocd.sh
+
 # setup-argocd:
 # 	@echo "$(GREEN)Setting up ArgoCD & Injecting SSH Key...$(RESET)"
 # 	@if [ ! -f ~/.ssh/id_rsa_argocd ]; then ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""; fi

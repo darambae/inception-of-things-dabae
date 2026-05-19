@@ -10,9 +10,8 @@ RESET  = \033[0m
 
 # ─── Cible par défaut ───────────────────────────────────────────────────────
 
-build: cluster namespaces argocd-install argocd-wait argocd-app password
+build: cluster namespaces argocd-install argocd-wait argocd-app password forward
 	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
-	@echo "$(YELLOW)Lance 'make forward' dans un autre terminal pour accéder à l'UI.$(RESET)"
 
 # ─── Cluster ────────────────────────────────────────────────────────────────
 
@@ -79,7 +78,7 @@ password:
 
 forward:
 	@echo "$(GREEN)UI ArgoCD dispo sur : https://localhost:9443$(RESET)"
-	kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 9443:443
+	@kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 9443:443
 
 sync:
 	kubectl -n $(ARGOCD_NS) patch configmap argocd-cm --patch \

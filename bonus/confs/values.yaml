@@ -5,6 +5,9 @@ global:
     configureCertmanager: false 
     tls:
       enabled: false
+    enable: true
+    provider: generic
+    class: none
   edition: ce
 
 certmanager:
@@ -15,10 +18,7 @@ gitlab-runner:
   install: false
 
 nginx-ingress:
-  enabled: true
-  controller:
-    replicaCount: 1
-    minAvailable: 1
+  enabled: false
 
 gitlab:
   kas:
@@ -42,6 +42,7 @@ gitlab:
   sidekiq:
     replicas: 1
     minReplicas: 1
+    maxReplicas: 1
     hpa:
       enabled: false
     resources:
@@ -52,6 +53,7 @@ gitlab:
   gitlab-shell:
     replicas: 1
     minReplicas: 1
+    maxReplicas: 1
     hpa:
       enabled: false
     resources:
@@ -73,6 +75,8 @@ redis:
 
 minio:
   replicas: 1
+  minReplicas: 1
+  maxReplicas: 1
   resources:
     requests:
       memory: "128Mi"
