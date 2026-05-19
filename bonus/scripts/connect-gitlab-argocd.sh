@@ -37,7 +37,6 @@ ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpat
 
 argocd login 127.0.0.1:9443 --username admin --password "$ARGOCD_PWD" --insecure
 
-# ArgoCD에 GitLab 레포지토리 등록 (실패해도 스크립트가 죽지 않도록 || true 처리)
 argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
     --ssh-private-key-path ~/.ssh/id_rsa_argocd \
     --insecure-ignore-host-key \
@@ -57,12 +56,14 @@ fi
 git config user.email "dabae@gmail.com"
 git config user.name "daram bae"
 
-# TOKEN=${GITLAB_TOKEN:-"glpat-YourGitLabTokenHere"}
-# GITLAB_AUTH_URL="http://oauth2:${TOKEN}@gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git"
-export GIT_SSH_COMMAND="ssh -i ~/.ssh/id_rsa_argocd -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-GITLAB_SSH_URL="git@gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git"
+GITLAB_USER="root"
+GITLAB_PASS=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode)
+ENCODED_PASS=$(echo -n "$GITLAB_PASS" | curl -s -o /dev/null -w "%{url_encoded}\n" -)
+
+GITLAB_HTTP_URL="http://${GITLAB_USER}:${ENCODED_PASS}@gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git"
+
 git remote remove origin 2>/dev/null || true
-git remote add origin "$GITLAB_SSH_URL"
+git remote add origin "$GITLAB_HTTP_URL"
 
 git add .
 git commit -m "Initial commit" --allow-empty

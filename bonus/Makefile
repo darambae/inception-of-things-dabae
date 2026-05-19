@@ -13,7 +13,7 @@ clean-vm:
 	vagrant destroy -f && rm -rf .vagrant
 #-------------------------------------------------------------------
 # Inside VM
-build: setup-dependencies max-memory confirm-status forward-gitlab password 
+build: setup-dependencies max-memory confirm-status connect-gitlab-argocd forward-gitlab 
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
@@ -25,31 +25,35 @@ confirm-status:
 	@chmod +x $(CURRENT_DIR)/scripts/check-status.sh
 	@$(CURRENT_DIR)/scripts/check-status.sh
 
-setup-argocd:
-	@echo "$(GREEN)Setting up ArgoCD & Injecting SSH Key...$(RESET)"
-	@if [ ! -f ~/.ssh/id_rsa_argocd ]; then ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""; fi
-	@TOOLBOX_POD=$$(kubectl get pods -n gitlab -o custom-columns=NAME:.metadata.name --no-headers | grep toolbox | head -n 1); \
-	PUB_KEY=$$(cat ~/.ssh/id_rsa_argocd.pub); \
-	kubectl exec -i -n gitlab $TOOLBOX_POD -- env PUB_KEY="$PUB_KEY" gitlab-rails runner "user = User.find_by_username('root'); if user; key = Key.find_by(title: 'argocd-ssh-key') || Key.new(title: 'argocd-ssh-key', user: user); key.key = ENV['PUB_KEY']; if key.save; puts '🚀 SSH Key Registered Successfully'; else; puts key.errors.full_messages; end; else; puts '❌ Root user not found'; end"; \
-	ARGOCD_PWD=$$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode); \
-	argocd login 127.0.0.1:9443 --username admin --password "$$ARGOCD_PWD" --insecure; \
-	argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
-		--ssh-private-key-path ~/.ssh/id_rsa_argocd \
-		--insecure-ignore-host-key \
-		--server 127.0.0.1:9443 || echo "⚠️ Repo already exists"
-setup-git:
-	@echo "$(GREEN)Initializing Git repository and pushing code...$(RESET)"
-	mkdir -p $(CURRENT_DIR)/../inception-of-things-bonus
-	cp -r $(CURRENT_DIR)/* $(CURRENT_DIR)/../inception-of-things-bonus/ 2>/dev/null || true
-	cd $(CURRENT_DIR)/../inception-of-things-bonus && \
-		git init --initial-branch=main && \
-		git config user.email "dabae@gmail.com" && \
-		git config user.name "daram bae" && \
-		git remote add origin http://gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git 2>/dev/null || true && \
-		git add . && \
-		git commit -m "Initial commit" --allow-empty && \
-		git push -u origin main --force
-	kubectl apply -f confs/application.yaml
+connect-gitlab-argocd:
+	@echo "$(GREEN)Connecting GitLab with ArgoCD...$(RESET)"
+	@chmod +x $(CURRENT_DIR)/scripts/connect-gitlab-argocd.sh
+	@$(CURRENT_DIR)/scripts/connect-gitlab-argocd.sh
+# setup-argocd:
+# 	@echo "$(GREEN)Setting up ArgoCD & Injecting SSH Key...$(RESET)"
+# 	@if [ ! -f ~/.ssh/id_rsa_argocd ]; then ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""; fi
+# 	@TOOLBOX_POD=$$(kubectl get pods -n gitlab -o custom-columns=NAME:.metadata.name --no-headers | grep toolbox | head -n 1); \
+# 	PUB_KEY=$$(cat ~/.ssh/id_rsa_argocd.pub); \
+# 	kubectl exec -i -n gitlab $TOOLBOX_POD -- env PUB_KEY="$PUB_KEY" gitlab-rails runner "user = User.find_by_username('root'); if user; key = Key.find_by(title: 'argocd-ssh-key') || Key.new(title: 'argocd-ssh-key', user: user); key.key = ENV['PUB_KEY']; if key.save; puts '🚀 SSH Key Registered Successfully'; else; puts key.errors.full_messages; end; else; puts '❌ Root user not found'; end"; \
+# 	ARGOCD_PWD=$$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode); \
+# 	argocd login 127.0.0.1:9443 --username admin --password "$$ARGOCD_PWD" --insecure; \
+# 	argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
+# 		--ssh-private-key-path ~/.ssh/id_rsa_argocd \
+# 		--insecure-ignore-host-key \
+# 		--server 127.0.0.1:9443 || echo "⚠️ Repo already exists"
+# setup-git:
+# 	@echo "$(GREEN)Initializing Git repository and pushing code...$(RESET)"
+# 	mkdir -p $(CURRENT_DIR)/../inception-of-things-bonus
+# 	cp -r $(CURRENT_DIR)/* $(CURRENT_DIR)/../inception-of-things-bonus/ 2>/dev/null || true
+# 	cd $(CURRENT_DIR)/../inception-of-things-bonus && \
+# 		git init --initial-branch=main && \
+# 		git config user.email "dabae@gmail.com" && \
+# 		git config user.name "daram bae" && \
+# 		git remote add origin http://gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git 2>/dev/null || true && \
+# 		git add . && \
+# 		git commit -m "Initial commit" --allow-empty && \
+# 		git push -u origin main --force
+# 	kubectl apply -f confs/application.yaml
 
 rm-pods:
 	@kubectl delete pods --all-namespaces --field-selector status.phase=Failed
