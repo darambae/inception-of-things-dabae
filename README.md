@@ -22,6 +22,6 @@ Inception of things
 4. Bonus
    1. How to test
     ! If you haven't built a VM, please set up the prerequisite following the step 1~8 of Part3 !
-    - cd scripts
-    - ./setup.sh
-    - 
+    - make build
+    - make setup-git (You have to enter username and password for gitlab)
+    - make setup-argocd

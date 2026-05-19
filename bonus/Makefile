@@ -2,6 +2,7 @@ GREEN = \033[0;32m
 RED   = \033[0;31m
 RESET = \033[0m
 CURRENT_DIR := $(CURDIR)
+
 # To manage VM on your host machine
 build-vm:
 	@echo "Building VMs....."
@@ -12,12 +13,12 @@ clean-vm:
 	vagrant destroy -f && rm -rf .vagrant
 #-------------------------------------------------------------------
 # Inside VM
-build: setup-dependencies confirm-status setup-argocd setup-git
+build: setup-dependencies confirm-status forward-gitlab password 
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
-	@chmod +x $(CURRENT_DIR)/scripts/setup.sh
-	@$(CURRENT_DIR)/scripts/setup.sh
+	@chmod +x $(CURRENT_DIR)/scripts/setup-gitlab.sh
+	@$(CURRENT_DIR)/scripts/setup-gitlab.sh
 
 confirm-status:
 	@echo "$(GREEN)Checking GitLab Pods Status...$(RESET)"
@@ -29,12 +30,8 @@ setup-argocd:
 	@if [ ! -f ~/.ssh/id_rsa_argocd ]; then ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""; fi
 	@TOOLBOX_POD=$$(kubectl get pods -n gitlab -o custom-columns=NAME:.metadata.name --no-headers | grep toolbox | head -n 1); \
 	PUB_KEY=$$(cat ~/.ssh/id_rsa_argocd.pub); \
-	kubectl exec -i -n gitlab $$TOOLBOX_POD -- \
-		gitlab-rails runner "user = User.find_by_username('root'); \
-		key = Key.find_by(title: 'argocd-ssh-key') || Key.new(title: 'argocd-ssh-key', key: '$$PUB_KEY', user: user); \
-		key.key = '$$PUB_KEY' if key.persisted?; \
-		if key.save; puts 'SSH Key Registered Successfully!'; else; puts key.errors.full_messages; end"; \
-	ARGOCD_PWD=$$(kubectl -n $(NAMESPACE_ARGOCD) get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode); \
+	kubectl exec -i -n gitlab $TOOLBOX_POD -- env PUB_KEY="$PUB_KEY" gitlab-rails runner "user = User.find_by_username('root'); if user; key = Key.find_by(title: 'argocd-ssh-key') || Key.new(title: 'argocd-ssh-key', user: user); key.key = ENV['PUB_KEY']; if key.save; puts '🚀 SSH Key Registered Successfully'; else; puts key.errors.full_messages; end; else; puts '❌ Root user not found'; end"; \
+	ARGOCD_PWD=$$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode); \
 	argocd login 127.0.0.1:9443 --username admin --password "$$ARGOCD_PWD" --insecure; \
 	argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
 		--ssh-private-key-path ~/.ssh/id_rsa_argocd \
@@ -42,9 +39,9 @@ setup-argocd:
 		--server 127.0.0.1:9443 || echo "⚠️ Repo already exists"
 setup-git:
 	@echo "$(GREEN)Initializing Git repository and pushing code...$(RESET)"
-	mkdir -p inception-of-things-bonus
-	cp -r $(CURRENT_DIR)/../inception-of-things-dabae/bonus/* inception-of-things-bonus/ 2>/dev/null || true
-	cd inception-of-things-bonus && \
+	mkdir -p $(CURRENT_DIR)/../inception-of-things-bonus
+	cp -r $(CURRENT_DIR)/* $(CURRENT_DIR)/../inception-of-things-bonus/ 2>/dev/null || true
+	cd $(CURRENT_DIR)/../inception-of-things-bonus && \
 		git init --initial-branch=main && \
 		git config user.email "dabae@gmail.com" && \
 		git config user.name "daram bae" && \
@@ -71,6 +68,7 @@ forward-gitlab:
 	@kubectl port-forward --address 0.0.0.0 svc/gitlab-nginx-ingress-controller -n gitlab 8081:80
 
 password:
+	@echo "$(GREEN)GitLab Root Password:$(RESET)"
 	@kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode && echo
 
 max-memory:
