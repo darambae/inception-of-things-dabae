@@ -27,7 +27,7 @@ confirm-status:
 
 forward:
 	@echo "$(GREEN)Forwarding GitLab on http://localhost:8081 in background...$(RESET)"
-	@nohup kubectl port-forward --address 0.0.0.0 svc/gitlab-nginx-ingress-controller -n gitlab 8081:80 > /dev/null 2>&1 &
+	@nohup kubectl port-forward --address 0.0.0.0 svc/traefik -n kube-system 8081:80 > /dev/null 2>&1 &
 	@sleep 2
 
 connect-gitlab-argocd:
