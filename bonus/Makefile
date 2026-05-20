@@ -25,6 +25,10 @@ forward:
 	@nohup kubectl port-forward --address 0.0.0.0 svc/traefik -n kube-system 8081:80 > /dev/null 2>&1 &
 	@sleep 2
 
+cancel-forward:
+	@echo "$(YELLOW)Arrêt du port-forwarding...$(RESET)"
+	@pid=$(lsof -t -i:8081) && kill -9 $$pid 2>/dev/null || true
+
 connect-gitlab-argocd:
 	@echo "$(GREEN)Connecting GitLab with ArgoCD...$(RESET)"
 	@chmod +x $(CURRENT_DIR)/scripts/connect-gitlab-argocd.sh

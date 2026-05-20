@@ -84,6 +84,10 @@ forward:
 	@echo "$(GREEN)UI ArgoCD dispo sur : https://localhost:9443$(RESET)"
 	@kubectl port-forward --address 0.0.0.0 svc/argocd-server -n argocd 9443:443
 
+cancel-forward:
+	@echo "$(YELLOW)Arrêt du port-forwarding...$(RESET)"
+	@pid=$(lsof -t -i:9443) && kill -9 $$pid 2>/dev/null || true
+
 sync:
 	kubectl -n $(ARGOCD_NS) patch configmap argocd-cm --patch \
 		'{"data":{"timeout.reconciliation":"10s"}}' 2>/dev/null || true
