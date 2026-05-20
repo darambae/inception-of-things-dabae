@@ -13,11 +13,6 @@ RESET  = \033[0m
 build: setup
 	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
 
-# ─── Configuration de l'environnement (VM, dépendances) ─────────────────────
-setup:
-	@echo "$(GREEN)Installation des dépendances...$(RESET)"
-	@chmod +x ./scripts/setup.sh
-	@./scripts/setup.sh
 # ─── Cluster ────────────────────────────────────────────────────────────────
 cluster:
 	@echo "$(GREEN)Création du cluster k3d...$(RESET)"
@@ -43,10 +38,7 @@ argocd-install:
 
 argocd-wait:
 	@echo "$(YELLOW)Attente des pods Argo CD (1-2 min)...$(RESET)"
-	kubectl wait --for=condition=ready pod \
-		-l app.kubernetes.io/name=argocd-server \
-		-n $(ARGOCD_NS) \
-		--timeout=10m
+	kubectl rollout status deployment argocd-server -n $(ARGOCD_NS) --timeout=20m
 
 # ─── Application ArgoCD (lien GitHub → cluster) ─────────────────────────────
 
