@@ -6,7 +6,8 @@ GREEN='\033[0;32m'
 RESET='\033[0m'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BONUS_DIR="$SCRIPT_DIR/../../inception-of-things-bonus"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+BONUS_DIR="$(cd "$PROJECT_DIR/.." && pwd)/inception-of-things-bonus"
 
 echo -e "${GREEN}Setting up ArgoCD & Injecting SSH Key...${RESET}"
 
@@ -35,7 +36,7 @@ end
 echo -e "${GREEN}Initializing Git repository and pushing code...${RESET}"
 
 mkdir -p "$BONUS_DIR"
-cp -r "$SCRIPT_DIR"/* "$BONUS_DIR/" 2>/dev/null || true
+rsync -a --delete --exclude='.git' "$PROJECT_DIR/" "$BONUS_DIR/"
 
 cd "$BONUS_DIR"
 
@@ -67,9 +68,8 @@ argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-
     --insecure-ignore-host-key \
     --server 127.0.0.1:9443
 
-
 echo -e "${GREEN}Applying ArgoCD Application yaml...${RESET}"
 
-kubectl apply -f "./confs/application.yaml"
+kubectl apply -f "./bonus/confs/application.yaml"
 
 echo -e "${GREEN}🎉 All Infrastructure Setup Completed Successfully!${RESET}"
