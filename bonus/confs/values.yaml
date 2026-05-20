@@ -11,9 +11,9 @@ global:
   edition: ce
 
 certmanager:
-  install: false
+  enabled: false
 certmanager-issuer:
-  install: false
+  enabled: false
 prometheus:
   install: false
 gitlab-runner:
