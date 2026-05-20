@@ -48,4 +48,4 @@ fi
 
 # Add user to docker group to prevent permission issues with k3d
 sudo usermod -aG docker $USER
-sg docker -c "echo '✅ Tools installed. Ready for make.'"
+newgrp docker
