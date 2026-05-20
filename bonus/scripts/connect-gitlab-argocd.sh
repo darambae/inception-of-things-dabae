@@ -70,6 +70,6 @@ argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-
 
 echo -e "${GREEN}Applying ArgoCD Application yaml...${RESET}"
 
-kubectl apply -f confs/application.yaml
+kubectl apply -f "./confs/application.yaml"
 
 echo -e "${GREEN}🎉 All Infrastructure Setup Completed Successfully!${RESET}"
