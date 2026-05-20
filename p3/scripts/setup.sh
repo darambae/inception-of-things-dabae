@@ -1,6 +1,11 @@
 #!/bin/bash
-# setup.sh — installe uniquement les outils nécessaires
+# setup.sh — installe les outils nécessaires et configure le cluster
 set -e
+
+NAME="iot-cluster"
+ARGOCD_NS="argocd"
+DEV_NS="dev"
+APP_CONF="confs/application.yaml"
 
 echo "==> Mise à jour des paquets..."
 sudo apt-get update -q
@@ -37,7 +42,7 @@ if ! grep -q "alias k=" ~/.bashrc; then
     echo 'complete -F __start_kubectl k' >> ~/.bashrc
 fi
 
-# argocd CLI (optionnel mais pratique pour les commandes argocd app sync etc.)
+# argocd CLI
 if ! command -v argocd &>/dev/null; then
     echo "==> Installation de la CLI ArgoCD..."
     ARGOCD_VERSION=$(curl -s https://api.github.com/repos/argoproj/argo-cd/releases/latest | grep tag_name | cut -d'"' -f4)
@@ -47,5 +52,42 @@ if ! command -v argocd &>/dev/null; then
 fi
 
 # Add user to docker group to prevent permission issues with k3d
-sudo usermod -aG docker $USER
-sg docker -c "echo '✅ Tools installed. Ready for make.'"
+sudo usermod -aG docker "$USER"
+
+echo "✅ Tools installed. Ready for make."
+
+# Toutes les étapes suivantes tournent dans le contexte du groupe docker
+sg docker -c "
+set -e
+
+echo '==> Création du cluster k3d...'
+k3d cluster create $NAME \
+    --agents 2 \
+    -p '8080:80@loadbalancer' \
+    -p '8888:8888@loadbalancer'
+
+echo '==> Création des namespaces...'
+kubectl create namespace $ARGOCD_NS --dry-run=client -o yaml | kubectl apply -f -
+kubectl create namespace $DEV_NS    --dry-run=client -o yaml | kubectl apply -f -
+
+echo '==> Installation d'\''Argo CD...'
+kubectl apply -n $ARGOCD_NS \
+    --server-side \
+    -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+echo '==> Attente des pods Argo CD (1-2 min)...'
+kubectl wait --for=condition=ready pod \
+    -l app.kubernetes.io/name=argocd-server \
+    -n $ARGOCD_NS \
+    --timeout=10m
+
+echo '==> Configuration de l'\''application ArgoCD...'
+kubectl apply -f $APP_CONF
+
+echo '==> Mot de passe Argo CD (user: admin) :'
+kubectl -n $ARGOCD_NS get secret argocd-initial-admin-secret \
+    -o jsonpath='{.data.password}' | base64 -d && echo
+
+echo '==> UI ArgoCD dispo sur : https://localhost:9443'
+kubectl port-forward --address 0.0.0.0 svc/argocd-server -n $ARGOCD_NS 9443:443
+"

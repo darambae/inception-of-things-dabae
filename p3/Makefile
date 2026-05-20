@@ -10,7 +10,7 @@ RESET  = \033[0m
 
 # ─── Cible par défaut ───────────────────────────────────────────────────────
 
-build: setup cluster namespaces argocd-install argocd-wait argocd-app password forward
+build: setup
 	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
 
 # ─── Configuration de l'environnement (VM, dépendances) ─────────────────────
