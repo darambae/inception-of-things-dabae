@@ -13,6 +13,12 @@ RESET  = \033[0m
 build: setup
 	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
 
+# ─── Configuration de l'environnement (VM, dépendances) ─────────────────────
+setup:
+	@echo "$(GREEN)Installation des dépendances...$(RESET)"
+	@chmod +x ./scripts/setup.sh
+	@./scripts/setup.sh
+
 # ─── Cluster ────────────────────────────────────────────────────────────────
 cluster:
 	@echo "$(GREEN)Création du cluster k3d...$(RESET)"
