@@ -37,6 +37,7 @@ password:
 cancel-forward:
 	@echo "$(YELLOW)Arrêt du port-forwarding...$(RESET)"
 	@pid=$(lsof -t -i:8081) && kill -9 $$pid 2>/dev/null || true
+
 rm-pods:
 	@kubectl delete pods --all-namespaces --field-selector status.phase=Failed
 	@kubectl delete pods --all-namespaces --field-selector status.phase=Evicted
