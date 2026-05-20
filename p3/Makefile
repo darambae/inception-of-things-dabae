@@ -10,11 +10,15 @@ RESET  = \033[0m
 
 # ─── Cible par défaut ───────────────────────────────────────────────────────
 
-build: cluster namespaces argocd-install argocd-wait argocd-app password forward
+build: setup cluster namespaces argocd-install argocd-wait argocd-app password forward
 	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
 
+# ─── Configuration de l'environnement (VM, dépendances) ─────────────────────
+setup:
+	@echo "$(GREEN)Installation des dépendances...$(RESET)"
+	@chmod +x ./scripts/setup.sh
+	@./scripts/setup.sh
 # ─── Cluster ────────────────────────────────────────────────────────────────
-
 cluster:
 	@echo "$(GREEN)Création du cluster k3d...$(RESET)"
 	k3d cluster create $(NAME) \
