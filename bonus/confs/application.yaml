@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git
     targetRevision: main
-    path: confs
+    path: p3/confs
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
