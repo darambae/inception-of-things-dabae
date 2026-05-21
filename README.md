@@ -2,9 +2,6 @@
 
 This repository contains a multi-part lab that demonstrates building and deploying an example application with GitLab and ArgoCD. Parts 1–3 can be run locally; the Bonus section requires a VM so it runs on top of Part 3.
 
-## Contents
-- `p1/`, `p2/`, `p3/` — project parts
-- `bonus/` — VM-based bonus material that depends on Part 3
 
 ## Quick overview
 1. Run Part 1 (local) — follow instructions in `p1/`

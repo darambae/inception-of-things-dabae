@@ -1,14 +1,9 @@
 #!/bin/bash
-export DEBIAN_FRONTEND=noninteractive
+set -e
 sudo -E apt-get update
 sudo -E apt-get install -y -q openssh-client curl
 
-curl -sfL https://get.k3s.io | sh -s - server \
-  --write-kubeconfig-mode 644 \
-  --disable traefik \
-  --disable metrics-server \
-  --disable-cloud-controller
-
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--node-name dabaeS --node-ip 192.168.56.110 --bind-address 192.168.56.110 --advertise-address 192.168.56.110 --write-kubeconfig-mode 644 --disable traefik --disable metrics" sh -
 if ! grep -q "alias k=" /home/vagrant/.bashrc; then
     echo 'alias k="kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml"' >> /home/vagrant/.bashrc
     echo 'source <(kubectl completion bash)' >> /home/vagrant/.bashrc
@@ -26,5 +21,10 @@ chmod 600 /home/vagrant/.ssh/id_rsa
 chmod 644 /home/vagrant/.ssh/id_rsa.pub
 
 cp /home/vagrant/.ssh/id_rsa.pub /vagrant/controller_id_rsa.pub
+
+echo "Waiting for K3s to generate node-token..."
+while [ ! -f /var/lib/rancher/k3s/server/node-token ]; do
+  sleep 1
+done
 
 sudo cat /var/lib/rancher/k3s/server/node-token > /vagrant/node-token
