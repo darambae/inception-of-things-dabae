@@ -32,6 +32,7 @@ gitlab:
   webservice:
     replicas: 1
     minReplicas: 1
+    progressDeadlineSeconds: 3000
     hpa:
       enabled: false
     resources:

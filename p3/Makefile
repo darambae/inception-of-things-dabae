@@ -8,16 +8,11 @@ RED    = \033[0;31m
 YELLOW = \033[0;33m
 RESET  = \033[0m
 
-# ─── Cible par défaut ───────────────────────────────────────────────────────
-
-build: setup
-	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
-
-# ─── Configuration de l'environnement (VM, dépendances) ─────────────────────
-setup:
+build:
 	@echo "$(GREEN)Installation des dépendances...$(RESET)"
 	@chmod +x ./scripts/setup.sh
 	@./scripts/setup.sh
+	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
 
 # ─── Cluster ────────────────────────────────────────────────────────────────
 cluster:

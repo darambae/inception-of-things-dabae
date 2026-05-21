@@ -45,7 +45,7 @@ rm-pods:
 clean:
 	@echo "$(RED)Cleaning up GitLab and Bonus resources...$(RESET)"
 	@helm uninstall gitlab -n gitlab 2>/dev/null || true
-	@k delete namespace gitlab --wait=true 2>/dev/null || true
+	@kubectl delete namespace gitlab --wait=true 2>/dev/null || true
 	@argocd repo rm http://gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git --insecure 2>/dev/null || true
 	
 	@echo "$(GREEN)Cleanup complete. Ready for re-run.$(RESET)"

@@ -2,7 +2,7 @@
 # setup.sh — installe les outils nécessaires et configure le cluster
 set -e
 
-NAME="iot-cluster"
+CLUSTER_NAME="iot-cluster"
 ARGOCD_NS="argocd"
 DEV_NS="dev"
 APP_CONF="confs/application.yaml"
@@ -51,9 +51,6 @@ if ! command -v argocd &>/dev/null; then
     sudo mv /tmp/argocd /usr/local/bin/argocd
 fi
 
-# Add user to docker group to prevent permission issues with k3d
-sudo usermod -aG docker "$USER"
-
 echo "✅ Tools installed. Ready for make."
 
 # Toutes les étapes suivantes tournent dans le contexte du groupe docker
@@ -61,7 +58,7 @@ sg docker -c "
 set -e
 
 echo '==> Création du cluster k3d...'
-k3d cluster create $NAME \
+k3d cluster create $CLUSTER_NAME \
     --agents 2 \
     -p '8080:80@loadbalancer' \
     -p '8888:8888@loadbalancer'
@@ -87,7 +84,7 @@ kubectl apply -f $APP_CONF
 echo '==> Mot de passe Argo CD (user: admin) :'
 kubectl -n $ARGOCD_NS get secret argocd-initial-admin-secret \
     -o jsonpath='{.data.password}' | base64 -d && echo
-
-echo '==> UI ArgoCD dispo sur : https://localhost:9443'
-kubectl port-forward --address 0.0.0.0 svc/argocd-server -n $ARGOCD_NS 9443:443
 "
+
+echo '==> UI ArgoCD dispo sur : https://argocd-iot.com:9443'
+nohup kubectl port-forward --address 0.0.0.0 svc/argocd-server -n $ARGOCD_NS 9443:443 > /dev/null 2>&1 &
