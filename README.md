@@ -24,6 +24,7 @@ make build
 ```bash
 make build
 vagrant ssh
+ip addr show eth1
 #checker le nom de la machine
 hostname
 #vérifier que k3s tourne
@@ -38,6 +39,10 @@ kubectl get all -n default
 #vérifier l'ingress
 kubectl get ingress
 kubectl describe ingress app-ingress
+#vérifier l'accessibilité des apps
+curl -H "Host: app1.com" http://192.168.56.110
+curl -H "Host: app2.com" http://192.168.56.110
+curl -H "Host: app3.com" http://192.168.56.110
 ```
 ---
 
