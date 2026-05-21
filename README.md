@@ -20,6 +20,10 @@ make build
 ```
 ---
 ## Running Part 2
+1. Build VM
+```bash
+make build
+```
 ---
 
 ## Running Part 3 (recommended flow)
@@ -34,7 +38,6 @@ make build
 ```
    - Host machine
 ```bash
-cd p3
 make build
 ```
 
@@ -53,12 +56,11 @@ Note: To access from your host machine, add the following to `/etc/hosts` on you
 ## Bonus
 The Bonus section is intended to run inside a Vagrant VM to avoid modifying your host system.
 
-Prerequisite: Part 3 must be set up and running (inside the VM or accessible from the VM).
+Prerequisite: Part 3 must be set up and running inside the VM.
 
 To build and enter the Bonus VM:
 
 ```bash
-cd bonus
 make build-vm
 vagrant ssh
 ```
@@ -66,12 +68,14 @@ vagrant ssh
 Inside the VM, run the bonus setup and connect ArgoCD to the GitLab instance:
 
 ```bash
-cd inception-of-things/bonus
+cd inception-of-things/p3
+make build
+cd ../bonus
 make build
 ```
 
 How to test the Bonus:
-- Open ArgoCD at `https://192.168.56.10:9443/`.
+- Open ArgoCD at `https://argocd-iot.com:9443/`.
 - Modify `inception-of-things-bonus/p3/confs/application.yaml` (e.g. change `v1` → `v2`) and commit/push.
 - If the `app-bonus` application becomes Healthy and Synced, the integration is working.
 
@@ -87,4 +91,3 @@ How to test the Bonus:
 - `make build` — run the full in-VM setup sequence
 - `make forward` — port-forward GitLab to host in background process
 - `make password` — print GitLab root password
-
