@@ -16,5 +16,7 @@ helm install gitlab gitlab/gitlab \
 
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""
 
-kubectl rollout status deployment/gitlab-webservice-default -n gitlab --timeout=35m
+kubectl wait --for=condition=available deployment/gitlab-webservice-default \
+    -n gitlab \
+    --timeout=35m
 echo "✅ GitLab deployment completed successfully!"

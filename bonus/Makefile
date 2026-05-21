@@ -13,7 +13,8 @@ clean-vm:
 	vagrant destroy -f && rm -rf .vagrant
 #-------------------------------------------------------------------
 # Inside VM
-build: setup-dependencies forward connect-gitlab-argocd 
+build: setup-dependencies forward connect-gitlab-argocd
+	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
@@ -50,26 +51,4 @@ clean:
 	
 	@echo "$(GREEN)Cleanup complete. Ready for re-run.$(RESET)"
 
-
 .PHONY: build-vm clean clean-vm password rm-pods forward-gitlab max-memory
-
-# To see the details of a pod: kubectl describe pod <pod_name> -n <namespace>
-# To see logs of a pod: kubectl logs <pod_name> -n <namespace>
-# To see live logs of a pod: kubectl logs -f <pod_name> -n <namespace>
-
-
-# STEPS
-# 1> Build VMs: make build-vm
-# 2> Build part 3: run p3/script/setup.sh -> make build, make forward 
-# 3> (Once argocd is ready and running) Build bonus part: run bonus/scripts/setup.sh 
-
-# IMPORTANT: Make sure to have the following pods in "Running" state and "Ready" condition before pushing code to GitLab:
-# Gitlab is fully operational if the following pods are in "Running" state and "Ready" condition:
-# 1. gitlab-postgresql-0 is running and ready
-# 2. gitlab-redis-0 is running and ready
-# 3. gitlab-gitaly-0 is running and ready
-# 4. gitlab-webservice-default-<random> is running and ready 
-
-# Once gitlab-webservice is running, git add, commit, and push to the repository to trigger ArgoCD synchronization.
-# To access to GitLab UI from your host machine, configure your etc/hosts like 192.168.56.10 gitlab.127.0.0.1.nip.io
-# And then open GitLab UI at http://gitlab.127.0.0.1.nip.io:8081/users/sign_in 

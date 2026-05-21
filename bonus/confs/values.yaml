@@ -32,7 +32,6 @@ gitlab:
   webservice:
     replicas: 1
     minReplicas: 1
-    progressDeadlineSeconds: 3000
     hpa:
       enabled: false
     resources:
@@ -82,51 +81,3 @@ minio:
     requests:
       memory: "128Mi"
       cpu: "50m"
-# global:
-#   hosts:
-#     domain: 127.0.0.1.nip.io
-#   ingress:
-#     configureCertmanager: false 
-#     tls:
-#       enabled: false
-#   edition: ce
-
-# gitlab:
-#   webservice:
-#     replicas: 1
-#     minReplicas: 1
-#     hpa:
-#       enable: false
-#     resources:
-#       requests:
-#         memory: 1.5Gi
-#   sidekiq:
-#     replicas: 1
-#     resources:
-#       requests:
-#         memory: 512Mi
-#   kas:
-#     enabled: false
-#   gitlab-shell:
-#     replicas: 1
-
-# postgresql:
-#   resources:
-#     requests:
-#       memory: "256Mi"
-
-# redis:
-#   resources:
-#     requests:
-#       memory: "128Mi"
-
-# prometheus:
-#   install: false
-# grafana:
-#   enabled: false
-# gitlab-runner:
-#   install: false
-# gitlab-exporter:
-#   enabled: false
-# certmanager:
-#   enabled: false

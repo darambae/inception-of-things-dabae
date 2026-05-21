@@ -13,30 +13,44 @@ This repository contains a multi-part lab that demonstrates building and deployi
 4. Bonus — runs inside a VM on top of Part 3 (see below)
 
 ---
+## Running Part 1
+1. Build VM
+```bash
+make build
+```
+---
+## Running Part 2
+---
 
 ## Running Part 3 (recommended flow)
-1. From the repo root, change into the `p3` scripts and run the build:
+0. For Part 3, you can run in your host machine. However, as we have done Bonus part and it should work with Part 3, I recommend you to run both Part 3 and Bonus in the VM that you can setup by 'make build-vm' in /bonus 
 
+1. To build part 3 either in your host machine or in the VM:
+   - VM
 ```bash
-cd p3/scripts
-./setup.sh
-cd ..
+vagrant ssh
+cd inception-of-things/p3
+make build
+```
+   - Host machine
+```bash
+cd p3
 make build
 ```
 
-2. Confirm the application is reachable at `http://192.168.56.10:8080/` (if using the VM) and ArgoCD at `https://192.168.56.10:9443/`.
+1. Confirm the application is reachable at `http://app-iot:8080/` (if using the VM) and ArgoCD at `https://argocd-iot.com:9443/`.
 
 Note: To access from your host machine, add the following to `/etc/hosts` on your host:
 
 ```
-192.168.56.10	gitlab.127.0.0.1.nip.io
+192.168.56.10	app-iot.com argocd-iot.com gitlab.127.0.0.1.nip.io
 ```
 
-3. To test ArgoCD sync: update `deployment.yaml` (e.g. change `v1` → `v2`), commit, and let ArgoCD synchronize. When the ArgoCD app shows Healthy & Synced, reload the application page to confirm the change.
+3. To test ArgoCD sync: update `deployment.yaml` (e.g. change `v1` → `v2`), commit, and let ArgoCD synchronize or manually press sync button. When the ArgoCD app shows Healthy & Synced, reload the application page to confirm the change.
 
 ---
 
-## Bonus (VM-based)
+## Bonus
 The Bonus section is intended to run inside a Vagrant VM to avoid modifying your host system.
 
 Prerequisite: Part 3 must be set up and running (inside the VM or accessible from the VM).
@@ -52,10 +66,7 @@ vagrant ssh
 Inside the VM, run the bonus setup and connect ArgoCD to the GitLab instance:
 
 ```bash
-cd inception-of-things-dabae/p3/scripts
-./setup.sh
-cd ../../..   # return to repo root inside VM
-cd bonus
+cd inception-of-things/bonus
 make build
 ```
 
@@ -67,13 +78,13 @@ How to test the Bonus:
 ---
 
 ## Troubleshooting
-- If `git push` fails with a 502, wait a few moments and retry — GitLab services may still be initializing.
+- If `git push` fails with a 502, wait a few moments and retry — GitLab services may be restarting.
 - Ensure the GitLab pods are Running and Ready before pushing code; use `kubectl get pods -n gitlab`.
 - If you can't reach ArgoCD/GitLab from the host, verify `/etc/hosts` and that port-forwards are running (see `make forward` in `bonus/Makefile`).
 
 ## Helpful Make targets (from `bonus/Makefile`)
 - `make build-vm` — create and start the VM
 - `make build` — run the full in-VM setup sequence
-- `make forward` — port-forward GitLab to host
+- `make forward` — port-forward GitLab to host in background process
 - `make password` — print GitLab root password
 
