@@ -17,4 +17,10 @@ if ! grep -q "alias k=" /home/vagrant/.bashrc; then
     echo 'complete -F __start_kubectl k' >> /home/vagrant/.bashrc
 fi
 
-kubectl apply -f /vagrant/apps.yaml
+echo "==> Attente de k3s..."
+until kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml get nodes &>/dev/null; do
+    sleep 2
+done
+echo "==> k3s prêt !"
+
+kubectl apply -f /vagrant/confs/apps.yaml

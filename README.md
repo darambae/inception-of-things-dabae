@@ -23,6 +23,21 @@ make build
 1. Build VM
 ```bash
 make build
+vagrant ssh
+#checker le nom de la machine
+hostname
+#vérifier que k3s tourne
+sudo systemctl status k3s
+k3s --version
+#vérifier le noeud et son ip
+kubectl get nodes -o wide
+#vérifier les 3 apps dans kube-system
+kubectl get all -n kube-system
+#vérifier les 3 apps dans default
+kubectl get all -n default
+#vérifier l'ingress
+kubectl get ingress
+kubectl describe ingress app-ingress
 ```
 ---
 
