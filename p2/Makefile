@@ -1,9 +1,9 @@
 build:
-	@echo "Building VMs....."
+	@echo "Génération des VMs....."
 	vagrant up
 
 clean:
-	@echo "Cleaning up VMs....."
+	@echo "Nettoyage des VMs....."
 	vagrant destroy -f && rm -rf .vagrant
 
 .PHONY: build clean
