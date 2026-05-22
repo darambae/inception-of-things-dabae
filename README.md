@@ -33,6 +33,7 @@ ip a show enp0s8
 ```bash
 make build
 vagrant ssh
+ip addr show eth1
 #checker le nom de la machine
 hostname
 #vérifier que k3s tourne
@@ -47,35 +48,71 @@ kubectl get all -n default
 #vérifier l'ingress
 kubectl get ingress
 kubectl describe ingress app-ingress
+#vérifier l'accessibilité des apps
+curl -H "Host: app1.com" http://192.168.56.110
+curl -H "Host: app2.com" http://192.168.56.110
+curl -H "Host: app3.com" http://192.168.56.110
 ```
 ---
 
-## Running Part 3 (recommended flow)
-0. For Part 3, you can run in your host machine. However, as we have done Bonus part and it should work with Part 3, I recommend you to run both Part 3 and Bonus in the VM that you can setup by 'make build-vm' in /bonus 
+## Partie 3
+Cette partie introduit le GitOps, une méthodologie de déploiement où Git est la source de vérité unique pour la configuration de l'infrastructure et des applications.
+Un cluster Kubernetes local est créé avec k3d (Kubernetes dans Docker), dans lequel ArgoCD est installé et configuré pour surveiller un dépôt GitHub. Tout changement poussé sur le dépôt est automatiquement détecté et déployé dans le cluster, sans aucune intervention manuelle.
+La configuration inclut un namespace dev dans lequel l'application tourne, et un namespace argocd pour les composants ArgoCD. L'application est exposée via un Ingress et peut être mise à jour simplement en poussant un nouveau tag d'image sur le dépôt GitHub — ArgoCD se charge du reste.
 
-1. To build part 3 either in your host machine or in the VM:
-   - VM
+Pour la partie 3, vous pouvez lancer le projet directement sur votre machine ou bien dans une machine virtuelle. 
+Comme nous avons fait le bonus, nous vous recommandons de lancer la vm de la bonus (`make build-vm` dans le dossier /bonus) puis de lancer la partie 3 dans cette machine (le git est automatiquement cloné dans la VM), vous gagnerez du temps. 
+
+# construire le cluster 
+si VM
 ```bash
 vagrant ssh
 cd inception-of-things/p3
 make build
 ```
-   - Host machine
+si machine hote
 ```bash
+cd p3
 make build
 ```
 
-1. Confirm the application is reachable at `http://app-iot:8080/` (if using the VM) and ArgoCD at `https://argocd-iot.com:9443/`.
+# Vérifier les namespaces
+kubectl get ns
 
-Note: To access from your host machine, add the following to `/etc/hosts` on your host:
+# Vérifier tous les pods ArgoCD
+kubectl get pods -n argocd
 
+# Vérifier tous les pods dev
+kubectl get pods -n dev
+
+# Vue complète
+kubectl get all -n argocd
+kubectl get all -n dev
+
+# Vérifier les noeuds du cluster k3d
+kubectl get nodes
+
+# pour la VM modifier `/etc/hosts` en ajoutant:
 ```
 192.168.56.10	app-iot.com argocd-iot.com gitlab.127.0.0.1.nip.io
 ```
+# pour la machine hote modifier `/etc/hosts` en ajoutant:
+```
+127.0.0.1	app-iot.com argocd-iot.com gitlab.127.0.0.1.nip.io
+```
 
-3. To test ArgoCD sync: update `deployment.yaml` (e.g. change `v1` → `v2`), commit, and let ArgoCD synchronize or manually press sync button. When the ArgoCD app shows Healthy & Synced, reload the application page to confirm the change.
+l'application est consultable via ce lien (curl ou navigateur) :
+`http://app-iot:8080/`
+l'interface ArgoCD via ce lien: 
+`https://argocd-iot.com:9443/`.
 
----
+# Pour tester le bon fonctionnement de ArgoCD:
+modifier le fichier `/p3/confs/deployment.yaml` (par exemple, 3 réplicas au lieu de 1 ou v2 au lieu de v1) 
+forcer la synchronisation de ArgoCD dans l'interface (ou bien utiliser la commande `make sync`)
+# pour voir le changement de version de l'app
+`curl http://localhost:8888/`
+# pour voir les réplicas
+`kubectl get pods -n dev`
 
 ## Bonus
 The Bonus section is intended to run inside a Vagrant VM to avoid modifying your host system.

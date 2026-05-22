@@ -6,6 +6,7 @@ Vagrant.configure("2") do |config|
     machine.vm.network "private_network", ip: "192.168.56.110"
     machine.vm.hostname = "kbrener-S"
     machine.vm.provider "virtualbox" do |set|
+      set.customize ["modifyvm", :id, "--name", "kbrener-S"]
       set.memory = "2048"
       set.cpus = 1
     end
