@@ -16,6 +16,10 @@ clean-vm:
 build: setup-dependencies forward connect-gitlab-argocd
 	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
 
+# run-p3:
+# 	@echo "$(GREEN)Running Bonus...$(RESET)"
+# 	@cd ../p3 && make build
+
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
 	@chmod +x $(CURRENT_DIR)/scripts/setup-gitlab.sh
