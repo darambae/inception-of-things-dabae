@@ -1,5 +1,4 @@
 #!/bin/bash
-# setup.sh — installe les outils nécessaires et configure le cluster
 set -e
 
 CLUSTER_NAME="iot-cluster"
