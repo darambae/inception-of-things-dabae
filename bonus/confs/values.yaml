@@ -9,17 +9,55 @@ global:
     provider: generic
     class: none
   edition: ce
+  psql:
+    host: gitlab-postgresql.gitlab.svc.cluster.local
+    port: 5432
+    database: gitlabhq_production
+    username: gitlab
+    password:
+      secret: gitlab-postgresql-password
+      key: postgresql-password
+
+  redis:
+    host: gitlab-redis-master.gitlab.svc.cluster.local
+    auth:
+      enabled: false
+
+  appConfig:
+    object_store:
+      enabled: true
+      connection:
+        secret: gitlab-objectstorage-secret
+    artifacts:
+      enabled: false
+    lfs:
+      enabled: false
+    uploads:
+      enabled: false
+    packages:
+      enabled: false
+    backups:
+      bucket: gitlab-backups
+      tmpBucket: gitlab-pseudo
 
 certmanager:
   enabled: false
 certmanager-issuer:
   enabled: false
+  email: admin@test.com
 prometheus:
   install: false
 gitlab-runner:
   install: false
 nginx-ingress:
   enabled: false
+
+postgresql:
+  install: false
+redis:
+  install: false
+minio:
+  install: false
 
 kas:
   enabled: false
@@ -29,6 +67,11 @@ gitlab-exporter:
   enabled: false
 
 gitlab:
+  toolbox:
+    enabled: false 
+    backups:
+      cron:
+        enabled: false
   webservice:
     replicas: 1
     minReplicas: 1
@@ -60,24 +103,3 @@ gitlab:
       requests:
         memory: 64Mi
         cpu: 50m
-
-postgresql:
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-
-redis:
-  resources:
-    requests:
-      memory: "128Mi"
-      cpu: "50m"
-
-minio:
-  replicas: 1
-  minReplicas: 1
-  maxReplicas: 1
-  resources:
-    requests:
-      memory: "128Mi"
-      cpu: "50m"

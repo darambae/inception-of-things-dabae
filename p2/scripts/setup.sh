@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get update
 sudo -E apt-get install -y -q curl
 
