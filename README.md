@@ -15,6 +15,18 @@ This repository contains a multi-part lab that demonstrates building and deployi
 ```bash
 make build
 ```
+2. Enter Server and Worker VMs using ssh
+```bash
+vagrant ssh dabaeS
+```
+ In another terminal,
+```bash
+vagrant ssh dabaeSW
+```
+3. Verify ip addresses
+```bash
+ip a show enp0s8
+```
 ---
 ## Running Part 2
 1. Build VM
