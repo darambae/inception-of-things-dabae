@@ -28,7 +28,7 @@ chmod 600  /home/vagrant/.ssh/id_rsa
 chmod 644  /home/vagrant/.ssh/id_rsa.pub
 cp /home/vagrant/.ssh/id_rsa.pub /vagrant/controller_id_rsa.pub
 
-echo "Waiting for K3s to generate node-token..."
+echo "En attente de la génération du node-token par K3s..."
 while [ ! -f /var/lib/rancher/k3s/server/node-token ]; do
   sleep 1
 done

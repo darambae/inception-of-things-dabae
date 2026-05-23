@@ -9,5 +9,5 @@ spec:
     app: wil-app
   ports:
     - protocol: TCP
-      port: 8888      # Port exposé par le service
-      targetPort: 8888 # Port sur lequel l'app écoute dans le Pod
+      port: 8888      
+      targetPort: 8888 

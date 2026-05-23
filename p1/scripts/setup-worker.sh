@@ -4,7 +4,7 @@ sudo -E apt-get update
 sudo -E apt-get install -y -q curl
 
 while [ ! -f /vagrant/node-token ]; do
-  echo "Waiting for /vagrant/node-token file..."
+  echo "En attente du fichier /vagrant/node-token ..."
   sleep 2
 done
 

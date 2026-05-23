@@ -9,50 +9,76 @@ This repository contains a multi-part lab that demonstrates building and deployi
 3. Run Part 3 (local or inside VM) — follow instructions in `p3/`
 4. Bonus — runs inside a VM on top of Part 3 (see below)
 
+## Prérequis
+- VirtualBox >= 7.x
+- Vagrant >= 2.x
 ---
-## Running Part 1
-1. Build VM
+
+## partie 1
+Cette partie introduit Vagrant et Kubernetes dans sa version allégée K3s. L'objectif est de mettre en place deux machines virtuelles communicantes via un réseau privé, provisionnées automatiquement par Vagrant.
+La première machine (kbrenerS, IP 192.168.56.110) fait tourner K3s en mode controller — c'est le nœud maître qui orchestre le cluster. La seconde machine (kbrenerSW, IP 192.168.56.111) fait tourner K3s en mode agent — c'est le nœud worker qui exécute les charges de travail sous les ordres du controller.
+Les deux machines sont configurées pour accepter des connexions SSH sans mot de passe, et kubectl est installé sur le controller pour interagir avec le cluster depuis l'intérieur.
+1. Générer les VM via vagrant
+dans p1/
 ```bash
 make build
 ```
-2. Enter Server and Worker VMs using ssh
+2. Entrer dans la VM server par ssh:
 ```bash
 vagrant ssh dabaeS
 ```
- In another terminal,
+
+# Vérifier l'adresse IP:
+```bash
+ip a show enp0s8
+ip a show eth1
+```
+# Vérifier le hostname
+`hostname`
+
+# Vérifier que k3s tourne
+`sudo systemctl status k3s`
+`k3s --version`
+# Vérifier que le server et le worker sont dans le même cluster
+`kubectl get nodes -o wide`
+
+Dans un autre terminal, entrer dans la VM worker:
 ```bash
 vagrant ssh dabaeSW
 ```
-3. Verify ip addresses
-```bash
-ip a show enp0s8
-```
+# Vérifier que k3s agent tourne sur le worker
+`sudo systemctl status k3s-agent`
 ---
-## Running Part 2
-1. Build VM
+
+## Partie 2
+Partie 2 — K3s et trois applications simples
+Cette partie introduit le routage HTTP par nom de domaine dans Kubernetes. Une seule machine virtuelle (kbrenerS, IP 192.168.56.110) fait tourner un cluster K3s qui héberge trois applications web simultanément sur la même adresse IP.
+Le composant clé est l'Ingress, qui joue le rôle d'aiguilleur : il analyse le header Host de chaque requête entrante et redirige vers la bonne application — app1.com vers app1, app2.com vers app2, et toute autre requête vers app3 par défaut.
+La deuxième application tourne avec trois réplicas, illustrant le load balancing : les requêtes sont automatiquement réparties entre les trois pods, et Kubernetes en recrée un automatiquement si l'un d'eux tombe.
+1. Générer la VM, dans /p1:
 ```bash
 make build
 vagrant ssh
 ip addr show eth1
-#checker le nom de la machine
-hostname
-#vérifier que k3s tourne
-sudo systemctl status k3s
-k3s --version
-#vérifier le noeud et son ip
-kubectl get nodes -o wide
-#vérifier les 3 apps dans kube-system
-kubectl get all -n kube-system
-#vérifier les 3 apps dans default
-kubectl get all -n default
-#vérifier l'ingress
-kubectl get ingress
-kubectl describe ingress app-ingress
-#vérifier l'accessibilité des apps
-curl -H "Host: app1.com" http://192.168.56.110
-curl -H "Host: app2.com" http://192.168.56.110
-curl -H "Host: app3.com" http://192.168.56.110
 ```
+# checker le nom de la machine
+`hostname`
+# vérifier que k3s tourne
+`sudo systemctl status k3s`
+`k3s --version`
+# vérifier le noeud et son ip
+`kubectl get nodes -o wide`
+# vérifier les 3 apps dans kube-system
+`kubectl get all -n kube-system`
+# vérifier les 3 apps dans default
+`kubectl get all -n default`
+# vérifier l'ingress
+`kubectl get ingress`
+`kubectl describe ingress app-ingress`
+# vérifier l'accessibilité des apps
+`curl -H "Host: app1.com" http://192.168.56.110`
+`curl -H "Host: app2.com" http://192.168.56.110`
+`curl -H "Host: app3.com" http://192.168.56.110`
 ---
 
 ## Partie 3
