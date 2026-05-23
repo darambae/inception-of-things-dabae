@@ -17,17 +17,12 @@ global:
     password:
       secret: gitlab-postgresql-password
       key: postgresql-password
-
   redis:
     host: gitlab-redis-master.gitlab.svc.cluster.local
     auth:
       enabled: false
 
   appConfig:
-    object_store:
-      enabled: true
-      connection:
-        secret: gitlab-objectstorage-secret
     artifacts:
       enabled: false
     lfs:
@@ -37,8 +32,8 @@ global:
     packages:
       enabled: false
     backups:
-      bucket: gitlab-backups
-      tmpBucket: gitlab-pseudo
+      bucket: ""
+      tmpBucket: ""
 
 certmanager:
   enabled: false
@@ -56,8 +51,6 @@ postgresql:
   install: false
 redis:
   install: false
-minio:
-  install: false
 
 kas:
   enabled: false
@@ -68,10 +61,15 @@ gitlab-exporter:
 
 gitlab:
   toolbox:
-    enabled: false 
+    enabled: true 
     backups:
       cron:
         enabled: false
+      objectStorage:
+        config:
+          secret: gitlab-objectstorage-secret
+          key: connection
+
   webservice:
     replicas: 1
     minReplicas: 1
@@ -103,3 +101,4 @@ gitlab:
       requests:
         memory: 64Mi
         cpu: 50m
+  
