@@ -15,6 +15,12 @@ if [ ! -f ~/.ssh/id_rsa_argocd ]; then
     ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""
 fi
 
+echo "Waiting for GitLab migrations to complete..."
+kubectl wait --for=condition=complete job \
+  -l app=migrations \
+  -n gitlab \
+  --timeout=10m
+
 TOOLBOX_POD=$(kubectl get pods -n gitlab -o custom-columns=NAME:.metadata.name --no-headers | grep toolbox | head -n 1)
 
 PUB_KEY=$(cat ~/.ssh/id_rsa_argocd.pub)
