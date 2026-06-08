@@ -16,14 +16,14 @@ This repository contains a multi-part lab that demonstrates building and deployi
 
 ## partie 1
 Cette partie introduit Vagrant et Kubernetes dans sa version allégée K3s. L'objectif est de mettre en place deux machines virtuelles communicantes via un réseau privé, provisionnées automatiquement par Vagrant.
-La première machine (kbrenerS, IP 192.168.56.110) fait tourner K3s en mode controller — c'est le nœud maître qui orchestre le cluster. La seconde machine (kbrenerSW, IP 192.168.56.111) fait tourner K3s en mode agent — c'est le nœud worker qui exécute les charges de travail sous les ordres du controller.
+La première machine (dabaeS, IP 192.168.56.110) fait tourner K3s en mode controller — c'est le nœud maître qui orchestre le cluster. La seconde machine (dabaeSW, IP 192.168.56.111) fait tourner K3s en mode agent — c'est le nœud worker qui exécute les charges de travail sous les ordres du controller.
 Les deux machines sont configurées pour accepter des connexions SSH sans mot de passe, et kubectl est installé sur le controller pour interagir avec le cluster depuis l'intérieur.
-1. Générer les VM via vagrant
+# Générer les VM via vagrant
 dans p1/
 ```bash
 make build
 ```
-2. Entrer dans la VM server par ssh:
+# Entrer dans la VM server par ssh:
 ```bash
 vagrant ssh dabaeS
 ```
@@ -48,6 +48,13 @@ vagrant ssh dabaeSW
 ```
 # Vérifier que k3s agent tourne sur le worker
 `sudo systemctl status k3s-agent`
+
+# Sortir de la connection ssh
+`exit`
+
+# Nettoyer les VMs
+`make clean`
+
 ---
 
 ## Partie 2
@@ -55,7 +62,7 @@ Partie 2 — K3s et trois applications simples
 Cette partie introduit le routage HTTP par nom de domaine dans Kubernetes. Une seule machine virtuelle (kbrenerS, IP 192.168.56.110) fait tourner un cluster K3s qui héberge trois applications web simultanément sur la même adresse IP.
 Le composant clé est l'Ingress, qui joue le rôle d'aiguilleur : il analyse le header Host de chaque requête entrante et redirige vers la bonne application — app1.com vers app1, app2.com vers app2, et toute autre requête vers app3 par défaut.
 La deuxième application tourne avec trois réplicas, illustrant le load balancing : les requêtes sont automatiquement réparties entre les trois pods, et Kubernetes en recrée un automatiquement si l'un d'eux tombe.
-1. Générer la VM, dans /p1:
+1. Générer la VM, dans /p2:
 ```bash
 make build
 vagrant ssh
@@ -79,6 +86,12 @@ ip addr show eth1
 `curl -H "Host: app1.com" http://192.168.56.110`
 `curl -H "Host: app2.com" http://192.168.56.110`
 `curl -H "Host: app3.com" http://192.168.56.110`
+
+# Sortir de la connection ssh
+`exit`
+
+# Nettoyer les VMs
+`make clean`
 ---
 
 ## Partie 3
@@ -87,7 +100,7 @@ Un cluster Kubernetes local est créé avec k3d (Kubernetes dans Docker), dans l
 La configuration inclut un namespace dev dans lequel l'application tourne, et un namespace argocd pour les composants ArgoCD. L'application est exposée via un Ingress et peut être mise à jour simplement en poussant un nouveau tag d'image sur le dépôt GitHub — ArgoCD se charge du reste.
 
 Pour la partie 3, vous pouvez lancer le projet directement sur votre machine ou bien dans une machine virtuelle. 
-Comme nous avons fait le bonus, nous vous recommandons de lancer la vm de la bonus (`make build-vm` dans le dossier /bonus) puis de lancer la partie 3 dans cette machine (le git est automatiquement cloné dans la VM), vous gagnerez du temps. 
+Comme nous avons fait le bonus, nous vous recommandons de lancer la vm du bonus (`make build-vm` dans le dossier /bonus) puis de lancer la partie 3 dans cette machine (le git est automatiquement cloné dans la VM), vous gagnerez du temps. 
 
 # construire le cluster 
 si VM
@@ -131,6 +144,7 @@ l'application est consultable via ce lien (curl ou navigateur) :
 `http://app-iot:8080/`
 l'interface ArgoCD via ce lien: 
 `https://argocd-iot.com:9443/`.
+mettre 'admin' pour le user et le mdp fourni dans le terminal après l'installation de k3d
 
 # Pour tester le bon fonctionnement de ArgoCD:
 modifier le fichier `/p3/confs/deployment.yaml` (par exemple, 3 réplicas au lieu de 1 ou v2 au lieu de v1) 
@@ -139,6 +153,12 @@ forcer la synchronisation de ArgoCD dans l'interface (ou bien utiliser la comman
 `curl http://localhost:8888/`
 # pour voir les réplicas
 `kubectl get pods -n dev`
+
+# arrêter le cluster:
+`make stop`
+
+# supprimer le cluster:
+`make clean`
 
 ## Bonus
 The Bonus section is intended to run inside a Vagrant VM to avoid modifying your host system.
