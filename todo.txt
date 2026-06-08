@@ -1,3 +1,40 @@
 finir le bonus
 tester p1, p2, p3 et bonus
 être capable d'expliquer chaque file
+
+à faire mardi 9 juin :
+aller dans bonus :
+`make build-vm`
+`vagrant ssh`
+aller dans inception_of_things\p3:
+`make build`
+aller dans bonus:
+`make build`
+
+puis si ça plante : 
+Voici la liste à exécuter la prochaine fois (dans la VM via vagrant ssh, depuis ~/inception-of-things/bonus) :
+
+
+# 1. État général du namespace gitlab
+kubectl get all -n gitlab -o wide
+
+# 2. Détail du pod (événements, raison du redémarrage/crash éventuel)
+kubectl describe pod -n gitlab -l app=gitlab | tail -80
+
+# 3. Logs du conteneur (le reconfigure omnibus affiche sa progression ici)
+kubectl logs -n gitlab -l app=gitlab --tail=80
+
+# 4. Vérifier si le pod a été tué par manque de mémoire (OOMKilled)
+kubectl get pod -n gitlab -l app=gitlab -o jsonpath='{.items[0].status.containerStatuses[0].lastState}'
+
+# 5. Mémoire/CPU réellement consommés par le pod
+kubectl top pod -n gitlab
+
+# 6. Mémoire/CPU de la VM elle-même (pour voir si c'est la VM qui sature)
+free -h && uptime
+Collez-moi simplement la sortie de ces 6 commandes et je pourrai diagnostiquer :
+
+Pending → souvent un souci de PVC/storage
+ImagePullBackOff → problème réseau/téléchargement de l'image
+CrashLoopBackOff + OOMKilled (commande 4 affichera "reason": "OOMKilled") → il faudra augmenter la mémoire de la VM ou réduire encore les limites de GitLab
+Running mais pas Ready → c'est probablement juste lent, le reconfigure est en cours (ça peut prendre 15-20 min sur une machine peu puissante), il suffit de patienter et relancer make build

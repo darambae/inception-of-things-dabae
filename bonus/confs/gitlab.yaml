@@ -41,6 +41,7 @@ metadata:
   namespace: gitlab
 spec:
   replicas: 1
+  progressDeadlineSeconds: 2400
   strategy:
     type: Recreate
   selector:
