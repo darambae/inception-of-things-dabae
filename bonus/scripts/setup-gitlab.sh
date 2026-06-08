@@ -2,47 +2,17 @@
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-GITLAB_CONFIG="${PROJECT_ROOT}/confs/values.yaml"
-PSQL_CONFIG="${PROJECT_ROOT}/confs/postgresql.yaml"
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+GITLAB_MANIFEST="${PROJECT_ROOT}/confs/gitlab.yaml"
 
 kubectl create namespace gitlab --dry-run=client -o yaml | kubectl apply -f -
 
-helm repo add gitlab https://charts.gitlab.io/
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
+kubectl apply -f "$GITLAB_MANIFEST"
 
+if [ ! -f ~/.ssh/id_rsa_argocd ]; then
+    ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N "" <<< y
+fi
 
-helm upgrade --install gitlab-redis bitnami/redis \
-  --namespace gitlab \
-  --set auth.enabled=false \
-  --set architecture=standalone \
-  --wait --timeout 15m
-
-kubectl apply -n gitlab -f "$PSQL_CONFIG"
-
-kubectl create secret generic gitlab-objectstorage-secret \
-  --namespace gitlab \
-  --from-literal=connection="" \
-  --dry-run=client -o yaml | kubectl apply -f -
-
-kubectl create secret generic gitlab-postgresql-password \
-  --namespace gitlab \
-  --from-literal=postgresql-password=gitlabpassword \
-  --dry-run=client -o yaml | kubectl apply -f -
-
-kubectl wait --for=condition=available deployment/gitlab-postgresql -n gitlab
-
-helm upgrade --install gitlab gitlab/gitlab \
-  --namespace gitlab \
-  -f "$GITLAB_CONFIG" \
-  --timeout 30m
-
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N "" <<< y
-
-echo "Waiting for GitLab to be ready..."
-kubectl wait --for=condition=available deployment/gitlab-webservice-default \
-    -n gitlab \
-    --timeout=35m
+echo "Waiting for GitLab to be ready (omnibus reconfigure can take 5-15 minutes)..."
+kubectl rollout status deployment/gitlab -n gitlab --timeout=35m
 
 echo "✅ GitLab deployment completed successfully!"

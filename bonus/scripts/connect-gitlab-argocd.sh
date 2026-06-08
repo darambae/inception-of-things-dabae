@@ -15,17 +15,14 @@ if [ ! -f ~/.ssh/id_rsa_argocd ]; then
     ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""
 fi
 
-echo "Waiting for GitLab migrations to complete..."
-kubectl wait --for=condition=complete job \
-  -l app=migrations \
-  -n gitlab \
-  --timeout=10m
+echo "Waiting for GitLab to be ready..."
+kubectl rollout status deployment/gitlab -n gitlab --timeout=10m
 
-TOOLBOX_POD=$(kubectl get pods -n gitlab -o custom-columns=NAME:.metadata.name --no-headers | grep toolbox | head -n 1)
+GITLAB_POD=$(kubectl get pods -n gitlab -l app=gitlab -o jsonpath='{.items[0].metadata.name}')
 
 PUB_KEY=$(cat ~/.ssh/id_rsa_argocd.pub)
 
-kubectl exec -i -n gitlab "$TOOLBOX_POD" -- env PUB_KEY="$PUB_KEY" gitlab-rails runner "
+kubectl exec -i -n gitlab "$GITLAB_POD" -- env PUB_KEY="$PUB_KEY" gitlab-rails runner "
 user = User.find_by_username('root')
 if user
   key = Key.find_by(title: 'argocd-ssh-key') || Key.new(title: 'argocd-ssh-key', user: user)
@@ -54,7 +51,7 @@ git config user.email "dabae@gmail.com"
 git config user.name "daram bae"
 
 GITLAB_USER="root"
-GITLAB_PASS=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode)
+GITLAB_PASS=$(kubectl exec -n gitlab "$GITLAB_POD" -- grep 'Password:' /etc/gitlab/initial_root_password | awk '{print $2}')
 ENCODED_PASS=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1]))' "$GITLAB_PASS")
 
 GITLAB_HTTP_URL="http://${GITLAB_USER}:${ENCODED_PASS}@gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git"
@@ -69,7 +66,7 @@ git push -u origin main
 ARGOCD_PWD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 --decode)
 argocd login 127.0.0.1:9443 --username admin --password "$ARGOCD_PWD" --insecure
 
-argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
+argocd repo add git@gitlab.gitlab.svc.cluster.local:root/inception-of-things-bonus.git \
     --ssh-private-key-path ~/.ssh/id_rsa_argocd \
     --insecure-ignore-host-key \
     --server 127.0.0.1:9443

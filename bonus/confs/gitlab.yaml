@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab-config
+  namespace: gitlab
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab-data
+  namespace: gitlab
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab-logs
+  namespace: gitlab
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+      - name: gitlab
+        image: gitlab/gitlab-ce:17.5.2-ce.0
+        ports:
+        - name: http
+          containerPort: 80
+        - name: ssh
+          containerPort: 22
+        env:
+        - name: GITLAB_OMNIBUS_CONFIG
+          value: |
+            external_url 'http://gitlab.127.0.0.1.nip.io:8081'
+
+            # --- Memory tuning for low-RAM environments ---
+            puma['worker_processes'] = 0
+            puma['per_worker_max_memory_mb'] = 850
+            sidekiq['concurrency'] = 2
+
+            postgresql['shared_buffers'] = "256MB"
+            postgresql['max_connections'] = 50
+
+            prometheus_monitoring['enable'] = false
+            grafana['enable'] = false
+            alertmanager['enable'] = false
+            gitlab_kas['enable'] = false
+            registry['enable'] = false
+            gitlab_rails['usage_ping_enabled'] = false
+
+            nginx['worker_processes'] = 1
+        resources:
+          requests:
+            memory: "2560Mi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+        readinessProbe:
+          httpGet:
+            path: /-/readiness
+            port: 80
+          initialDelaySeconds: 200
+          periodSeconds: 20
+          failureThreshold: 30
+        livenessProbe:
+          httpGet:
+            path: /-/liveness
+            port: 80
+          initialDelaySeconds: 300
+          periodSeconds: 30
+          failureThreshold: 10
+        volumeMounts:
+        - name: config
+          mountPath: /etc/gitlab
+        - name: data
+          mountPath: /var/opt/gitlab
+        - name: logs
+          mountPath: /var/log/gitlab
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: gitlab-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: gitlab-data
+      - name: logs
+        persistentVolumeClaim:
+          claimName: gitlab-logs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  selector:
+    app: gitlab
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+  - name: ssh
+    port: 22
+    targetPort: 22
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitlab
+  namespace: gitlab
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: gitlab.127.0.0.1.nip.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: gitlab
+            port:
+              number: 80

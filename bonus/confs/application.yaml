@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-of-things-bonus.git
+    repoURL: git@gitlab.gitlab.svc.cluster.local:root/inception-of-things-bonus.git
     targetRevision: main
     path: p3/confs
   destination:
