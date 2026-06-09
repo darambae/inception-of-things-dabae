@@ -1,0 +1,174 @@
+NAME                          READY   STATUS             RESTARTS        AGE   IP           NODE                       NOMINATED NODE   READINESS GATES
+pod/gitlab-794c7549dd-h29k8   0/1     CrashLoopBackOff   10 (4m5s ago)   38m   10.42.2.12   k3d-iot-cluster-server-0   <none>           <none>
+
+NAME             TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)         AGE   SELECTOR
+service/gitlab   ClusterIP   10.43.113.114   <none>        80/TCP,22/TCP   38m   app=gitlab
+
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                         SELECTOR
+deployment.apps/gitlab   0/1     1            0           38m   gitlab       gitlab/gitlab-ce:17.5.2-ce.0   app=gitlab
+
+NAME                                DESIRED   CURRENT   READY   AGE   CONTAINERS   IMAGES                         SELECTOR
+replicaset.apps/gitlab-794c7549dd   1         1         0       38m   gitlab       gitlab/gitlab-ce:17.5.2-ce.0   app=gitlab,pod-template-hash=794c7549dd
+\n
+      Reason:       CrashLoopBackOff
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    1
+      Started:      Tue, 09 Jun 2026 08:44:29 +0000
+      Finished:     Tue, 09 Jun 2026 08:44:37 +0000
+    Ready:          False
+    Restart Count:  11
+    Limits:
+      memory:  4Gi
+    Requests:
+      cpu:      500m
+      memory:   2560Mi
+    Liveness:   http-get http://:80/-/liveness delay=300s timeout=1s period=30s #success=1 #failure=10
+    Readiness:  http-get http://:80/-/readiness delay=200s timeout=1s period=20s #success=1 #failure=30
+    Environment:
+      GITLAB_OMNIBUS_CONFIG:  external_url 'http://gitlab.127.0.0.1.nip.io:8081'
+                              
+                              # --- Memory tuning for low-RAM environments ---
+                              puma['worker_processes'] = 0
+                              puma['per_worker_max_memory_mb'] = 850
+                              sidekiq['concurrency'] = 2
+                              
+                              postgresql['shared_buffers'] = "256MB"
+                              postgresql['max_connections'] = 50
+                              
+                              prometheus_monitoring['enable'] = false
+                              grafana['enable'] = false
+                              alertmanager['enable'] = false
+                              gitlab_kas['enable'] = false
+                              registry['enable'] = false
+                              gitlab_rails['usage_ping_enabled'] = false
+                              
+                              nginx['worker_processes'] = 1
+                              
+    Mounts:
+      /etc/gitlab from config (rw)
+      /var/log/gitlab from logs (rw)
+      /var/opt/gitlab from data (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-66487 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  config:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  gitlab-config
+    ReadOnly:   false
+  data:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  gitlab-data
+    ReadOnly:   false
+  logs:
+    Type:       PersistentVolumeClaim (a reference to a PersistentVolumeClaim in the same namespace)
+    ClaimName:  gitlab-logs
+    ReadOnly:   false
+  kube-api-access-66487:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  40m                   default-scheduler  Successfully assigned gitlab/gitlab-794c7549dd-h29k8 to k3d-iot-cluster-server-0
+  Normal   Pulling    40m                   kubelet            spec.containers{gitlab}: Pulling image "gitlab/gitlab-ce:17.5.2-ce.0"
+  Normal   Pulled     33m                   kubelet            spec.containers{gitlab}: Successfully pulled image "gitlab/gitlab-ce:17.5.2-ce.0" in 6m33.711s (6m33.711s including waiting). Image size: 1625189912 bytes.
+  Normal   Started    17m (x9 over 33m)     kubelet            spec.containers{gitlab}: Container started
+  Normal   Created    11m (x10 over 33m)    kubelet            spec.containers{gitlab}: Container created
+  Warning  BackOff    2m34s (x38 over 33m)  kubelet            spec.containers{gitlab}: Back-off restarting failed container gitlab in pod gitlab-794c7549dd-h29k8_gitlab(70d428b4-5db3-4629-b10b-f18112922f1b)
+  Normal   Pulled     73s (x11 over 33m)    kubelet            spec.containers{gitlab}: Container image "gitlab/gitlab-ce:17.5.2-ce.0" already present on machine and can be accessed by the pod
+/opt/gitlab/embedded/cookbooks/package/libraries/helpers/selinux_distro_helper.rb:2: warning: previous definition of REDHAT_RELEASE_FILE was here
+/opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/helpers/selinux_distro_helper.rb:3: warning: already initialized constant SELinuxDistroHelper::OS_RELEASE_FILE
+/opt/gitlab/embedded/cookbooks/package/libraries/helpers/selinux_distro_helper.rb:3: warning: previous definition of OS_RELEASE_FILE was here
+/opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/helpers/secrets_helper.rb:4: warning: already initialized constant SecretsHelper::SECRETS_FILE
+/opt/gitlab/embedded/cookbooks/package/libraries/helpers/secrets_helper.rb:4: warning: previous definition of SECRETS_FILE was here
+/opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/helpers/secrets_helper.rb:5: warning: already initialized constant SecretsHelper::SECRETS_FILE_CHEF_ATTR
+/opt/gitlab/embedded/cookbooks/package/libraries/helpers/secrets_helper.rb:5: warning: previous definition of SECRETS_FILE_CHEF_ATTR was here
+/opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/helpers/secrets_helper.rb:6: warning: already initialized constant SecretsHelper::SKIP_GENERATE_SECRETS_CHEF_ATTR
+/opt/gitlab/embedded/cookbooks/package/libraries/helpers/secrets_helper.rb:6: warning: previous definition of SKIP_GENERATE_SECRETS_CHEF_ATTR was here
+/opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/gitlab_cluster.rb:16: warning: already initialized constant GitlabCluster::CONFIG_PATH
+/opt/gitlab/embedded/cookbooks/package/libraries/gitlab_cluster.rb:16: warning: previous definition of CONFIG_PATH was here
+/opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/gitlab_cluster.rb:17: warning: already initialized constant GitlabCluster::JSON_FILE
+/opt/gitlab/embedded/cookbooks/package/libraries/gitlab_cluster.rb:17: warning: previous definition of JSON_FILE was here
+Loading Cinc Auditor profile files:
+Loading Cinc Auditor input files:
+Loading Cinc Auditor waiver files:
+
+================================================================================
+Recipe Compile Error in /opt/gitlab/embedded/cookbooks/cache/cookbooks/gitlab/recipes/default.rb
+================================================================================
+
+Mixlib::Config::UnknownConfigOptionError
+----------------------------------------
+Reading unsupported config value grafana.
+
+Cookbook Trace: (most recent call first)
+----------------------------------------
+  /opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/settings_dsl.rb:125:in `internal_get'
+  /opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/settings_dsl.rb:105:in `block in from_file'
+  /opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/config_mash.rb:35:in `auto_vivify'
+  /opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/settings_dsl.rb:105:in `from_file'
+  /opt/gitlab/embedded/cookbooks/cache/cookbooks/gitlab/recipes/config.rb:28:in `from_file'
+  /opt/gitlab/embedded/cookbooks/cache/cookbooks/gitlab/recipes/default.rb:27:in `from_file'
+
+Relevant File Content:
+----------------------
+/opt/gitlab/embedded/cookbooks/cache/cookbooks/package/libraries/settings_dsl.rb:
+
+118:    end
+119:  
+120:    # Enhance get so strict mode errors aren't thrown as long as the setting is witin our defined config
+121:    def internal_get(symbol)
+122:      if configuration.key?(symbol)
+123:        configuration[symbol]
+124:      else
+125>>       super
+126:      end
+127:    end
+128:  
+129:    def sanitized_config
+130:      results = { "gitlab" => {}, "roles" => {}, "monitoring" => {} }
+131:  
+132:      # Add the settings to the results
+133:      sorted_settings.each do |key, value|
+134:        raise "Attribute parent value invalid for key: #{key} (#{value})" if value[:parent] && !results.key?(value[:parent])
+
+System Info:
+------------
+chef_version=18.3.0
+platform=ubuntu
+platform_version=22.04
+ruby=ruby 3.2.5 (2024-07-26 revision 31d0f1a2e7) [x86_64-linux]
+program_name=/opt/gitlab/embedded/bin/cinc-client
+executable=/opt/gitlab/embedded/bin/cinc-client
+
+
+Running handlers:
+[2026-06-09T08:44:37+00:00] ERROR: Running exception handlers
+There was an error running gitlab-ctl reconfigure:
+
+Reading unsupported config value grafana.
+
+Running handlers complete
+[2026-06-09T08:44:37+00:00] ERROR: Exception handlers complete
+Infra Phase failed. 0 resources updated in 02 seconds
+[2026-06-09T08:44:37+00:00] FATAL: Stacktrace dumped to /opt/gitlab/embedded/cookbooks/cache/cinc-stacktrace.out
+[2026-06-09T08:44:37+00:00] FATAL: ---------------------------------------------------------------------------------------
+[2026-06-09T08:44:37+00:00] FATAL: PLEASE PROVIDE THE CONTENTS OF THE stacktrace.out FILE (above) IF YOU FILE A BUG REPORT
+[2026-06-09T08:44:37+00:00] FATAL: ---------------------------------------------------------------------------------------
+[2026-06-09T08:44:37+00:00] FATAL: Mixlib::Config::UnknownConfigOptionError: Reading unsupported config value grafana.
+{"terminated":{"containerID":"containerd://a0278243bebe17ee0500e5f63534baa148e96b107b8262e9ab4a0335ba363465","exitCode":1,"finishedAt":"2026-06-09T08:44:37Z","reason":"Error","startedAt":"2026-06-09T08:44:29Z"}}error: Metrics not available for pod gitlab/gitlab-794c7549dd-h29k8, age: 45m48.563333511s
+ 08:51:57 up  1:13,  1 user,  load average: 0.16, 0.16, 0.19
