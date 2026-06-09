@@ -44,9 +44,9 @@ helm upgrade --install gitlab gitlab/gitlab \
 
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N "" <<< y
 
-echo "Waiting for GitLab to be ready..."
+echo "En attente que GitLab soit pret..."
 kubectl wait --for=condition=available deployment/gitlab-webservice-default \
     -n gitlab \
     --timeout=35m
 
-echo "✅ GitLab deployment completed successfully!"
+echo "✅ Deploiement de GitLab termine avec succes !"

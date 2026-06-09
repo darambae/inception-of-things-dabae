@@ -9,13 +9,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BONUS_DIR="$(cd "$PROJECT_DIR/.." && pwd)/inception-of-things-bonus"
 
-echo -e "${GREEN}Setting up ArgoCD & Injecting SSH Key...${RESET}"
+echo -e "${GREEN}Configuration d'ArgoCD et injection de la cle SSH...${RESET}"
 
 if [ ! -f ~/.ssh/id_rsa_argocd ]; then
     ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_argocd -N ""
 fi
 
-echo "Waiting for GitLab migrations to complete..."
+echo "En attente de la fin des migrations GitLab..."
 kubectl wait --for=condition=complete job \
   -l app=migrations \
   -n gitlab \
@@ -43,7 +43,7 @@ else
   puts '❌ Root user not found'
 end
 "
-echo -e "${GREEN}Initializing Git repository and pushing code...${RESET}"
+echo -e "${GREEN}Initialisation du depot Git et push du code...${RESET}"
 
 mkdir -p "$BONUS_DIR"
 rsync -a --delete --exclude='.git' "$PROJECT_DIR/" "$BONUS_DIR/"
@@ -78,8 +78,8 @@ argocd repo add git@gitlab-gitlab-shell.gitlab.svc.cluster.local:root/inception-
     --insecure-ignore-host-key \
     --server 127.0.0.1:9443
 
-echo -e "${GREEN}Applying ArgoCD Application yaml...${RESET}"
+echo -e "${GREEN}Application du YAML ArgoCD Application...${RESET}"
 
 kubectl apply -f "./bonus/confs/application.yaml"
 
-echo -e "${GREEN}🎉 All Infrastructure Setup Completed Successfully!${RESET}"
+echo -e "${GREEN}🎉 Configuration complete de l'infrastructure terminee avec succes !${RESET}"

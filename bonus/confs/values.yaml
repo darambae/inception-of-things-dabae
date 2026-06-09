@@ -7,8 +7,8 @@ global:
     tls:
       enabled: false
     enabled: true
-    provider: generic
-    class: none
+    provider: traefik
+    class: traefik
     gatewayAPI:
       enabled: false
   edition: ce

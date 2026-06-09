@@ -33,9 +33,9 @@ if ! command -v kubectl &>/dev/null; then
     sudo mv ./kubectl /usr/local/bin/kubectl
 fi
 
-# Add aliases to .bashrc
+# Ajout des alias dans .bashrc
 if ! grep -q "alias k=" ~/.bashrc; then
-    echo "⌨️ Adding aliases (k=kubectl)..."
+    echo "⌨️ Ajout des alias (k=kubectl)..."
     echo 'alias k="kubectl"' >> ~/.bashrc
     echo 'source <(kubectl completion bash)' >> ~/.bashrc
     echo 'complete -F __start_kubectl k' >> ~/.bashrc
@@ -50,7 +50,7 @@ if ! command -v argocd &>/dev/null; then
     sudo mv /tmp/argocd /usr/local/bin/argocd
 fi
 
-echo "✅ Tools installed. Ready for make."
+echo "✅ Outils installes. Pret pour make."
 
 # Toutes les étapes suivantes tournent dans le contexte du groupe docker
 sg docker <<EOF
@@ -58,7 +58,7 @@ set -e
 
 echo '==> Création du cluster k3d...'
 if k3d cluster list | grep -q "^${CLUSTER_NAME}"; then
-  echo "⚠️  Cluster '${CLUSTER_NAME}' already exists, skipping..."
+    echo "⚠️  Le cluster '${CLUSTER_NAME}' existe deja, etape ignoree..."
 else
   k3d cluster create ${CLUSTER_NAME} \
       --agents 2 \
