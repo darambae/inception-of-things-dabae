@@ -45,7 +45,7 @@ fi
 if ! command -v argocd &>/dev/null; then
     echo "==> Installation de la CLI ArgoCD..."
     ARGOCD_VERSION=$(curl -s https://api.github.com/repos/argoproj/argo-cd/releases/latest | grep tag_name | cut -d'"' -f4)
-    curl -sSL -o /tmp/argocd "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
+    curl -SL -o /tmp/argocd "https://github.com/argoproj/argo-cd/releases/download/${ARGOCD_VERSION}/argocd-linux-amd64"
     chmod +x /tmp/argocd
     sudo mv /tmp/argocd /usr/local/bin/argocd
 fi

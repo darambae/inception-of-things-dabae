@@ -4,14 +4,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 GITLAB_CONFIG="${PROJECT_ROOT}/confs/values.yaml"
 PSQL_CONFIG="${PROJECT_ROOT}/confs/postgresql.yaml"
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-4 | bash
 kubectl create namespace gitlab --dry-run=client -o yaml | kubectl apply -f -
 
 helm repo add gitlab https://charts.gitlab.io/
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
-
 
 helm upgrade --install gitlab-redis bitnami/redis \
   --namespace gitlab \
@@ -31,7 +29,13 @@ kubectl create secret generic gitlab-postgresql-password \
   --from-literal=postgresql-password=gitlabpassword \
   --dry-run=client -o yaml | kubectl apply -f -
 
-kubectl wait --for=condition=available deployment/gitlab-postgresql -n gitlab
+kubectl wait --for=condition=available deployment/gitlab-postgresql -n gitlab --timeout=10m
+kubectl delete crd backendtlspolicies.gateway.networking.k8s.io
+kubectl delete crd referencegrants.gateway.networking.k8s.io
+kubectl delete crd gatewayclasses.gateway.networking.k8s.io
+kubectl delete crd grpcroutes.gateway.networking.k8s.io
+kubectl delete crd httproutes.gateway.networking.k8s.io
+kubectl delete crd gateways.gateway.networking.k8s.io
 
 helm upgrade --install gitlab gitlab/gitlab \
   --namespace gitlab \

@@ -30,10 +30,14 @@ user = User.find_by_username('root')
 if user
   key = Key.find_by(title: 'argocd-ssh-key') || Key.new(title: 'argocd-ssh-key', user: user)
   key.key = ENV['PUB_KEY']
+  org_klass = Object.const_get('Organizations::Organization') rescue (Object.const_get('Namespaces::Organization') rescue nil)
+  key.organization = org_klass.first if org_klass
   if key.save
-    puts '🚀 SSH Key Registered Successfully'
+    puts '🚀 SSH Key Registered Successfully in DB'
+    (Gitlab::Shell.new.add_key(key.shell_id, key.key) rescue (Gitlab::Shell.instance.add_key(key.shell_id, key.key) rescue nil))
+    puts '🔄 GitLab Shell Key Sync Completed'
   else
-    puts key.errors.full_messages
+    puts \"❌ Save Failed: #{key.errors.full_messages.join(', ')}\"
   end
 else
   puts '❌ Root user not found'

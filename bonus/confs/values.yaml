@@ -1,6 +1,7 @@
 global:
   hosts:
     domain: 127.0.0.1.nip.io
+    https: false
   ingress:
     configureCertmanager: false 
     tls:
@@ -8,6 +9,8 @@ global:
     enabled: true
     provider: generic
     class: none
+    gatewayAPI:
+      enabled: false
   edition: ce
   psql:
     host: gitlab-postgresql.gitlab.svc.cluster.local
@@ -21,7 +24,12 @@ global:
     host: gitlab-redis-master.gitlab.svc.cluster.local
     auth:
       enabled: false
-
+  certmanager:
+    enabled: false
+  kas:
+    enabled: false
+  gitlab-exporter:
+    enabled: false
   appConfig:
     artifacts:
       enabled: false
@@ -35,6 +43,8 @@ global:
       bucket: ""
       tmpBucket: ""
 
+envoy-gateway:
+  enabled: false
 certmanager:
   enabled: false
 certmanager-issuer:
@@ -60,6 +70,10 @@ gitlab-exporter:
   enabled: false
 
 gitlab:
+  kas:
+    enabled: false
+  gitlab-exporter:
+    enabled: false
   toolbox:
     enabled: true 
     backups:
@@ -73,6 +87,7 @@ gitlab:
   webservice:
     replicas: 1
     minReplicas: 1
+    maxReplicas: 1
     hpa:
       enabled: false
     resources:
@@ -101,4 +116,3 @@ gitlab:
       requests:
         memory: 64Mi
         cpu: 50m
-  
