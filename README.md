@@ -1,6 +1,6 @@
 # Inception of Things
 
-Ce dépôt contient un laboratoire en plusieurs parties illustrant la construction et le déploiement d'une application exemple avec GitLab et ArgoCD. Les parties 1 à 3 peuvent être exécutées localement ; la section Bonus nécessite une VM et s'appuie sur la Partie 3.
+Ce dépôt contient des exemples d'utilisation de vagrant / k3s / k3d et argoCD pour apprendre l'intégration continue (CI/CD).
 
 ## Prérequis
 
@@ -67,7 +67,7 @@ make clean  # Supprimer les VMs
 
 ## Partie 2 — K3s et trois applications
 
-Cette partie introduit le routage HTTP par nom de domaine dans Kubernetes. Une seule machine virtuelle (**kbrenerS**, IP `192.168.56.110`) fait tourner un cluster K3s hébergeant trois applications web simultanément sur la même adresse IP.
+Cette partie introduit le routage HTTP par nom de domaine dans Kubernetes. Une seule machine virtuelle (**kbrener-S**, IP `192.168.56.110`) fait tourner un cluster K3s hébergeant trois applications web simultanément sur la même adresse IP.
 
 L'**Ingress** joue le rôle d'aiguilleur : il analyse le header `Host` de chaque requête et redirige vers la bonne application — `app1.com` → app1, `app2.com` → app2, toute autre requête → app3 par défaut.
 
