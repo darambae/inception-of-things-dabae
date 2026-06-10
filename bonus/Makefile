@@ -3,7 +3,7 @@ RED   = \033[0;31m
 RESET = \033[0m
 CURRENT_DIR := $(CURDIR)
 
-# To manage VM on your host machine
+# To manage VM
 build-vm:
 	@echo "Building VMs....."
 	vagrant up
@@ -12,13 +12,9 @@ clean-vm:
 	@echo "Cleaning up VMs....."
 	vagrant destroy -f && rm -rf .vagrant
 #-------------------------------------------------------------------
-# Inside VM
+# Inside the VM
 build: setup-dependencies forward connect-gitlab-argocd
 	@echo "$(GREEN)✅ Tout est prêt !$(RESET)"
-
-# run-p3:
-# 	@echo "$(GREEN)Running Bonus...$(RESET)"
-# 	@cd ../p3 && make build
 
 setup-dependencies:
 	@echo "$(GREEN)Installing dependencies...$(RESET)"
@@ -34,10 +30,6 @@ connect-gitlab-argocd:
 	@echo "$(GREEN)Connecting GitLab with ArgoCD...$(RESET)"
 	@chmod +x $(CURRENT_DIR)/scripts/connect-gitlab-argocd.sh
 	@$(CURRENT_DIR)/scripts/connect-gitlab-argocd.sh
-
-password:
-	@echo "$(GREEN)GitLab Root Password:$(RESET)"
-	@kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 --decode && echo
 
 cancel-forward:
 	@echo "$(YELLOW)Arrêt du port-forwarding...$(RESET)"
@@ -55,4 +47,4 @@ clean:
 	
 	@echo "$(GREEN)Cleanup complete. Ready for re-run.$(RESET)"
 
-.PHONY: build-vm clean clean-vm password rm-pods forward-gitlab max-memory
+.PHONY: build-vm clean clean-vm password rm-pods forward cancel-forward build setup-dependencies connect-gitlab-argocd

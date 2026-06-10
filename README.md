@@ -160,41 +160,57 @@ forcer la synchronisation de ArgoCD dans l'interface (ou bien utiliser la comman
 ### supprimer le cluster:
 `make clean`
 
+---
 ## Bonus
-The Bonus section is intended to run inside a Vagrant VM to avoid modifying your host system.
 
-Prerequisite: Part 3 must be set up and running inside the VM.
+> Cette partie s'ajoute par-dessus la **Partie 3** et nécessite l'exécution d'une instance GitLab locale, intégrée à l'ArgoCD créé précédemment. Cette étape est conçue pour s'exécuter entièrement à l'intérieur d'une machine virtuelle (VM) afin d'éviter toute modification du système hôte.
+>
+> Pour vous faciliter la tâche, le dossier de ce projet est pré-cloné directement dans la VM.
 
-To build and enter the Bonus VM:
+---
+
+### Architecture
+
+- **Pipeline GitOps** : Ajout d'une nouvelle application (pipeline) dans l'ArgoCD de la Partie 3, configurée pour surveiller un nouveau dépôt hébergé sur votre instance GitLab locale.
+- **Composants externes** : En raison de l'utilisation de la dernière version du Helm Chart GitLab, certains composants externes indispensables (tels que PostgreSQL et Redis) ont été installés séparément pour garantir la stabilité.
+- **Gestion de Git** : La gestion des dépôts dans GitLab s'effectue via une connexion SSH sécurisée, et la création du nouveau dépôt est entièrement automatisée par le script d'installation.
+
+---
+
+### Comment lancer le projet
+
+> ⚠️ **Prérequis** : La Partie 3 doit être correctement configurée et active à l'intérieur de la VM.
+
+### 1. Construire et accéder à la VM du bonus
 
 ```bash
 make build-vm
 vagrant ssh
 ```
 
-Inside the VM, run the bonus setup and connect ArgoCD to the GitLab instance:
+### 2. Lancer la Partie 3 puis déployer le Bonus
+
+> L'installation complète peut prendre jusqu'à **30 minutes**.
 
 ```bash
 cd inception-of-things/p3
 make build
+
+# Une fois la partie 3 prête, passez au bonus
 cd ../bonus
 make build
 ```
 
-How to test the Bonus:
-- Open ArgoCD at `https://argocd-iot.com:9443/`.
-- Modify `inception-of-things-bonus/p3/confs/application.yaml` (e.g. change `v1` → `v2`) and commit/push.
-- If the `app-bonus` application becomes Healthy and Synced, the integration is working.
-
 ---
 
-## Troubleshooting
-- If `git push` fails with a 502, wait a few moments and retry — GitLab services may be restarting.
-- Ensure the GitLab pods are Running and Ready before pushing code; use `kubectl get pods -n gitlab`.
-- If you can't reach ArgoCD/GitLab from the host, verify `/etc/hosts` and that port-forwards are running (see `make forward` in `bonus/Makefile`).
+### Comment tester le Bonus
 
-## Helpful Make targets (from `bonus/Makefile`)
-- `make build-vm` — create and start the VM
-- `make build` — run the full in-VM setup sequence
-- `make forward` — port-forward GitLab to host in background process
-- `make password` — print GitLab root password
+1. Ouvrez l'interface d'ArgoCD : [https://argocd-iot.com:9443/](https://argocd-iot.com:9443/)
+
+2. Modifiez le fichier de configuration de l'application bonus :
+   ```
+   inception-of-things-bonus/p3/confs/deployment.yaml
+   ```
+   Par exemple, passez le tag de l'image de `v1` à `v2`, puis effectuez un **commit** et un **push** vers votre GitLab.
+
+3. Une fois que l'application `app-bonus` passe au statut **Healthy** et **Synced** sur ArgoCD, vérifiez le changement de version sur : [http://app-iot.com:8080/](http://app-iot.com:8080/)
