@@ -2,6 +2,7 @@ GREEN = \033[0;32m
 RED   = \033[0;31m
 RESET = \033[0m
 CURRENT_DIR := $(CURDIR)
+NAME = iot-cluster
 
 # To manage VM
 build-vm:
@@ -40,11 +41,13 @@ rm-pods:
 	@kubectl delete pods --all-namespaces --field-selector status.phase=Evicted
 
 clean:
-	@echo "$(RED)Cleaning up GitLab and Bonus resources...$(RESET)"
-	@helm uninstall gitlab -n gitlab 2>/dev/null || true
-	@kubectl delete namespace gitlab --wait=true 2>/dev/null || true
-	@argocd repo rm http://gitlab.127.0.0.1.nip.io:8081/root/inception-of-things-bonus.git --insecure 2>/dev/null || true
+	rm -rf ../../inception-of-things-bonus
+	@echo "$(RED)Suppression du cluster $(NAME)...$(RESET)"
+	k3d cluster delete $(NAME)
+	@echo "$(RED)Suppression de k3d...$(RESET)"
+	sudo rm -f /usr/local/bin/k3d
+	@echo "$(RED)Suppression des images Docker...$(RESET)"
+	docker system prune -af
 	
-	@echo "$(GREEN)Cleanup complete. Ready for re-run.$(RESET)"
 
 .PHONY: build-vm clean clean-vm password rm-pods forward cancel-forward build setup-dependencies connect-gitlab-argocd

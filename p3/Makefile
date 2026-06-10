@@ -60,6 +60,10 @@ stop:
 clean:
 	@echo "$(RED)Suppression du cluster $(NAME)...$(RESET)"
 	k3d cluster delete $(NAME)
+	@echo "$(RED)Suppression de k3d...$(RESET)"
+	sudo rm -f /usr/local/bin/k3d
+	@echo "$(RED)Suppression des images Docker...$(RESET)"
+	docker system prune -af
 
 fclean: clean cancel-forward
 	@echo "$(GREEN)Nettoyage complet effectué.$(RESET)"
