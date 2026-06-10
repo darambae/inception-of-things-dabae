@@ -71,7 +71,7 @@ ip addr show eth1
 ### checker le nom de la machine
 `hostname`
 ### vérifier que k3s tourne
-`sudo systemctl status k3s`
+`systemctl status k3s`
 `k3s --version`
 ### vérifier le noeud et son ip
 `kubectl get nodes -o wide`
