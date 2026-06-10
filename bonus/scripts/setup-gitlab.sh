@@ -30,12 +30,12 @@ kubectl create secret generic gitlab-postgresql-password \
   --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl wait --for=condition=available deployment/gitlab-postgresql -n gitlab --timeout=10m
-kubectl delete crd backendtlspolicies.gateway.networking.k8s.io
-kubectl delete crd referencegrants.gateway.networking.k8s.io
-kubectl delete crd gatewayclasses.gateway.networking.k8s.io
-kubectl delete crd grpcroutes.gateway.networking.k8s.io
-kubectl delete crd httproutes.gateway.networking.k8s.io
-kubectl delete crd gateways.gateway.networking.k8s.io
+# kubectl delete crd backendtlspolicies.gateway.networking.k8s.io
+# kubectl delete crd referencegrants.gateway.networking.k8s.io
+# kubectl delete crd gatewayclasses.gateway.networking.k8s.io
+# kubectl delete crd grpcroutes.gateway.networking.k8s.io
+# kubectl delete crd httproutes.gateway.networking.k8s.io
+# kubectl delete crd gateways.gateway.networking.k8s.io
 
 helm upgrade --install gitlab gitlab/gitlab \
   --namespace gitlab \

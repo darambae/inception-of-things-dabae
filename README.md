@@ -198,9 +198,9 @@ make clean  # Supprimer le cluster
 
 ## Bonus — GitLab local + ArgoCD
 
-Cette partie s'ajoute par-dessus la **Partie 3** et nécessite une instance GitLab locale intégrée à l'ArgoCD précédemment créé. Elle s'exécute entièrement dans une VM afin d'éviter toute modification du système hôte. Le dossier du projet est pré-cloné dans la VM.
+Cette partie s'ajoute par-dessus la **Partie 3** et nécessite une instance GitLab locale intégrée à l'ArgoCD précédemment créé. 
 
-> ⚠️ **Prérequis** : La Partie 3 doit être correctement configurée et active dans la VM.
+> ⚠️ **Prérequis** : La Partie 3 doit être correctement configurée et active.
 
 ### Architecture
 
@@ -211,7 +211,7 @@ Cette partie s'ajoute par-dessus la **Partie 3** et nécessite une instance GitL
 ### Démarrage
 
 ```bash
-# 1. Créer et démarrer la VM (depuis le dossier bonus/)
+# Optionnel: Créer et démarrer la VM (depuis le dossier bonus/)
 make build-vm
 vagrant ssh
 
