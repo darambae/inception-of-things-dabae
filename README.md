@@ -18,41 +18,41 @@ This repository contains a multi-part lab that demonstrates building and deployi
 Cette partie introduit Vagrant et Kubernetes dans sa version allégée K3s. L'objectif est de mettre en place deux machines virtuelles communicantes via un réseau privé, provisionnées automatiquement par Vagrant.
 La première machine (dabaeS, IP 192.168.56.110) fait tourner K3s en mode controller — c'est le nœud maître qui orchestre le cluster. La seconde machine (dabaeSW, IP 192.168.56.111) fait tourner K3s en mode agent — c'est le nœud worker qui exécute les charges de travail sous les ordres du controller.
 Les deux machines sont configurées pour accepter des connexions SSH sans mot de passe, et kubectl est installé sur le controller pour interagir avec le cluster depuis l'intérieur.
-# Générer les VM via vagrant
+### Générer les VM via vagrant
 dans p1/
 ```bash
 make build
 ```
-# Entrer dans la VM server par ssh:
+### Entrer dans la VM server par ssh:
 ```bash
 vagrant ssh dabaeS
 ```
 
-# Vérifier l'adresse IP:
+### Vérifier l'adresse IP:
 ```bash
 ip a show enp0s8
 ip a show eth1
 ```
-# Vérifier le hostname
+### Vérifier le hostname
 `hostname`
 
-# Vérifier que k3s tourne
-`sudo systemctl status k3s`
+### Vérifier que k3s tourne
+`systemctl status k3s`
 `k3s --version`
-# Vérifier que le server et le worker sont dans le même cluster
+### Vérifier que le server et le worker sont dans le même cluster
 `kubectl get nodes -o wide`
 
 Dans un autre terminal, entrer dans la VM worker:
 ```bash
 vagrant ssh dabaeSW
 ```
-# Vérifier que k3s agent tourne sur le worker
-`sudo systemctl status k3s-agent`
+### Vérifier que k3s agent tourne sur le worker
+`systemctl status k3s-agent`
 
-# Sortir de la connection ssh
+### Sortir de la connection ssh
 `exit`
 
-# Nettoyer les VMs
+### Nettoyer les VMs
 `make clean`
 
 ---
@@ -62,35 +62,35 @@ Partie 2 — K3s et trois applications simples
 Cette partie introduit le routage HTTP par nom de domaine dans Kubernetes. Une seule machine virtuelle (kbrenerS, IP 192.168.56.110) fait tourner un cluster K3s qui héberge trois applications web simultanément sur la même adresse IP.
 Le composant clé est l'Ingress, qui joue le rôle d'aiguilleur : il analyse le header Host de chaque requête entrante et redirige vers la bonne application — app1.com vers app1, app2.com vers app2, et toute autre requête vers app3 par défaut.
 La deuxième application tourne avec trois réplicas, illustrant le load balancing : les requêtes sont automatiquement réparties entre les trois pods, et Kubernetes en recrée un automatiquement si l'un d'eux tombe.
-1. Générer la VM, dans /p2:
+### Générer la VM, dans /p2:
 ```bash
 make build
 vagrant ssh
 ip addr show eth1
 ```
-# checker le nom de la machine
+### checker le nom de la machine
 `hostname`
-# vérifier que k3s tourne
+### vérifier que k3s tourne
 `sudo systemctl status k3s`
 `k3s --version`
-# vérifier le noeud et son ip
+### vérifier le noeud et son ip
 `kubectl get nodes -o wide`
-# vérifier les 3 apps dans kube-system
+### vérifier les 3 apps dans kube-system
 `kubectl get all -n kube-system`
-# vérifier les 3 apps dans default
+### vérifier les 3 apps dans default
 `kubectl get all -n default`
-# vérifier l'ingress
+### vérifier l'ingress
 `kubectl get ingress`
 `kubectl describe ingress app-ingress`
-# vérifier l'accessibilité des apps
+### vérifier l'accessibilité des apps
 `curl -H "Host: app1.com" http://192.168.56.110`
 `curl -H "Host: app2.com" http://192.168.56.110`
 `curl -H "Host: app3.com" http://192.168.56.110`
 
-# Sortir de la connection ssh
+### Sortir de la connection ssh
 `exit`
 
-# Nettoyer les VMs
+### Nettoyer les VMs
 `make clean`
 ---
 
@@ -102,7 +102,7 @@ La configuration inclut un namespace dev dans lequel l'application tourne, et un
 Pour la partie 3, vous pouvez lancer le projet directement sur votre machine ou bien dans une machine virtuelle. 
 Comme nous avons fait le bonus, nous vous recommandons de lancer la vm du bonus (`make build-vm` dans le dossier /bonus) puis de lancer la partie 3 dans cette machine (le git est automatiquement cloné dans la VM), vous gagnerez du temps. 
 
-# construire le cluster 
+### construire le cluster 
 si VM
 ```bash
 vagrant ssh
@@ -115,27 +115,27 @@ cd p3
 make build
 ```
 
-# Vérifier les namespaces
+### Vérifier les namespaces
 kubectl get ns
 
-# Vérifier tous les pods ArgoCD
+### Vérifier tous les pods ArgoCD
 kubectl get pods -n argocd
 
-# Vérifier tous les pods dev
+### Vérifier tous les pods dev
 kubectl get pods -n dev
 
-# Vue complète
+### Vue complète
 kubectl get all -n argocd
 kubectl get all -n dev
 
-# Vérifier les noeuds du cluster k3d
+### Vérifier les noeuds du cluster k3d
 kubectl get nodes
 
-# pour la VM modifier `/etc/hosts` en ajoutant:
+### pour la VM modifier `/etc/hosts` en ajoutant:
 ```
 192.168.56.10	app-iot.com argocd-iot.com gitlab.127.0.0.1.nip.io
 ```
-# pour la machine hote modifier `/etc/hosts` en ajoutant:
+### pour la machine hote modifier `/etc/hosts` en ajoutant:
 ```
 127.0.0.1	app-iot.com argocd-iot.com gitlab.127.0.0.1.nip.io
 ```
@@ -146,18 +146,18 @@ l'interface ArgoCD via ce lien:
 `https://argocd-iot.com:9443/`.
 mettre 'admin' pour le user et le mdp fourni dans le terminal après l'installation de k3d
 
-# Pour tester le bon fonctionnement de ArgoCD:
+### Pour tester le bon fonctionnement de ArgoCD:
 modifier le fichier `/p3/confs/deployment.yaml` (par exemple, 3 réplicas au lieu de 1 ou v2 au lieu de v1) 
 forcer la synchronisation de ArgoCD dans l'interface (ou bien utiliser la commande `make sync`)
-# pour voir le changement de version de l'app
+### pour voir le changement de version de l'app
 `curl http://localhost:8888/`
-# pour voir les réplicas
+### pour voir les réplicas
 `kubectl get pods -n dev`
 
-# arrêter le cluster:
+### arrêter le cluster:
 `make stop`
 
-# supprimer le cluster:
+### supprimer le cluster:
 `make clean`
 
 ## Bonus
