@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-sudo -E apt-get update
-sudo -E apt-get install -y -q curl
+sudo apt-get update
+sudo apt-get install -y -q curl
 
 while [ ! -f /vagrant/node-token ]; do
   echo "En attente du fichier /vagrant/node-token ..."

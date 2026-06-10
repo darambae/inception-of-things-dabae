@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
-sudo -E apt-get update
-sudo -E apt-get install -y -q curl
+sudo apt-get update
+sudo apt-get install -y -q curl
 
 curl -sfL https://get.k3s.io | sh -s - server \
   --write-kubeconfig-mode 644 \
