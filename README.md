@@ -215,7 +215,7 @@ Cette partie s'ajoute par-dessus la **Partie 3** et nécessite une instance GitL
 make build-vm
 vagrant ssh
 
-# 2. Lancer la Partie 3
+# 1. Lancer la Partie 3
 cd inception-of-things/p3
 make build
 
