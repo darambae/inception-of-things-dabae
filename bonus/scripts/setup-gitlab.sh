@@ -30,12 +30,27 @@ kubectl create secret generic gitlab-postgresql-password \
   --dry-run=client -o yaml | kubectl apply -f -
 
 kubectl wait --for=condition=available deployment/gitlab-postgresql -n gitlab --timeout=10m
-# kubectl delete crd backendtlspolicies.gateway.networking.k8s.io
-# kubectl delete crd referencegrants.gateway.networking.k8s.io
-# kubectl delete crd gatewayclasses.gateway.networking.k8s.io
-# kubectl delete crd grpcroutes.gateway.networking.k8s.io
-# kubectl delete crd httproutes.gateway.networking.k8s.io
-# kubectl delete crd gateways.gateway.networking.k8s.io
+
+CRDS=(
+  "backendtlspolicies.gateway.networking.k8s.io"
+  "referencegrants.gateway.networking.k8s.io"
+  "gatewayclasses.gateway.networking.k8s.io"
+  "grpcroutes.gateway.networking.k8s.io"
+  "httproutes.gateway.networking.k8s.io"
+  "gateways.gateway.networking.k8s.io"
+)
+
+echo "==> Checking and deleting Gateway API CRDs if they exist..."
+
+for crd in "${CRDS[@]}"; do
+  if kubectl get crd "$crd" &>/dev/null; then
+    echo "Found CRD: $crd. Deleting..."
+    kubectl delete crd "$crd"
+  else
+    echo "CRD not found: $crd (Skipping)"
+  fi
+done
+echo "==> CRD cleanup process completed completed cleanly!"
 
 helm upgrade --install gitlab gitlab/gitlab \
   --namespace gitlab \
